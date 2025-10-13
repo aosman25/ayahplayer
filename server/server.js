@@ -10,6 +10,19 @@ app.use(express.json());
 
 const { CLIENT_ID, CLIENT_SECRET, AUTH_URL, BASE_URL } = process.env;
 
+// Middleware to check for access token
+const requireAccessToken = (req, res, next) => {
+  if (!req.body) {
+    return res.status(400).json({ error: "Request body is required" });
+  }
+  const { access_token: accessToken } = req.body;
+  if (!accessToken) {
+    return res.status(401).json({ error: "Access Token is required" });
+  }
+  req.accessToken = accessToken;
+  next();
+};
+
 app.post("/api/token", async (req, res) => {
   try {
     const auth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
@@ -36,18 +49,14 @@ app.post("/api/token", async (req, res) => {
   }
 });
 
-app.post("/api/chapters", async (req, res) => {
+app.post("/api/chapters", requireAccessToken, async (req, res) => {
   try {
-    const { access_token: accessToken } = req.body;
-    if (!accessToken) {
-      return res.status(400).json({ error: "Access Token is required" });
-    }
     const response = await axios({
       method: "get",
       url: `${BASE_URL}/content/api/v4/chapters`,
       headers: {
         Accept: "application/json",
-        "x-auth-token": accessToken,
+        "x-auth-token": req.accessToken,
         "x-client-id": CLIENT_ID,
       },
     });
@@ -57,18 +66,15 @@ app.post("/api/chapters", async (req, res) => {
   }
 });
 
-app.post("/api/reciters", async (req, res) => {
+app.post("/api/reciters", requireAccessToken, async (req, res) => {
   try {
-    const { access_token: accessToken, language = "en" } = req.body;
-    if (!accessToken) {
-      return res.status(400).json({ error: "Access Token is required" });
-    }
+    const { language = "en" } = req.body;
     const response = await axios({
       method: "get",
       url: `${BASE_URL}/content/api/v4/resources/recitations`,
       headers: {
         Accept: "application/json",
-        "x-auth-token": accessToken,
+        "x-auth-token": req.accessToken,
         "x-client-id": CLIENT_ID,
       },
       params: {
@@ -81,12 +87,8 @@ app.post("/api/reciters", async (req, res) => {
   }
 });
 
-app.post("/api/rub/:rub_number/recitation/:recitation_id", async (req, res) => {
+app.post("/api/rub/:rub_number/recitation/:recitation_id", requireAccessToken, async (req, res) => {
   try {
-    const { access_token: accessToken } = req.body;
-    if (!accessToken) {
-      return res.status(400).json({ error: "Access Token is required" });
-    }
     const rubNumber = Number(req.params.rub_number);
     const recitationId = Number(req.params.recitation_id);
     if (isNaN(rubNumber) || isNaN(recitationId)) {
@@ -101,7 +103,7 @@ app.post("/api/rub/:rub_number/recitation/:recitation_id", async (req, res) => {
       url: `${BASE_URL}/content/api/v4/recitations/${recitationId}/by_rub/${rubNumber}`,
       headers: {
         Accept: "application/json",
-        "x-auth-token": accessToken,
+        "x-auth-token": req.accessToken,
         "x-client-id": CLIENT_ID,
       },
     });
@@ -111,12 +113,8 @@ app.post("/api/rub/:rub_number/recitation/:recitation_id", async (req, res) => {
   }
 });
 
-app.post("/api/verses/rub/:rub_number", async (req, res) => {
+app.post("/api/verses/rub/:rub_number", requireAccessToken, async (req, res) => {
   try {
-    const { access_token: accessToken } = req.body;
-    if (!accessToken) {
-      return res.status(400).json({ error: "Access Token is required" });
-    }
     const rubNumber = Number(req.params.rub_number);
     if (isNaN(rubNumber)) {
       return res.status(400).json({ error: "Rub Number must be a valid number" });
@@ -128,7 +126,7 @@ app.post("/api/verses/rub/:rub_number", async (req, res) => {
       url: `${BASE_URL}/content/api/v4/verses/by_rub/${rubNumber}`,
       headers: {
         Accept: "application/json",
-        "x-auth-token": accessToken,
+        "x-auth-token": req.accessToken,
         "x-client-id": CLIENT_ID,
       },
     });
