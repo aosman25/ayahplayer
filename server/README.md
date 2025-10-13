@@ -8,6 +8,7 @@ A TypeScript-based Express server for the QuranHifz application, built with MVC 
 - **MVC Architecture**: Organized code with controllers, routes, and middleware
 - **OAuth2 Authentication**: Secure token-based authentication
 - **RESTful API**: Clean and consistent API endpoints
+- **Swagger Documentation**: Interactive API documentation with Swagger UI
 - **Error Handling**: Proper error handling with appropriate status codes
 
 ## Project Structure
@@ -27,9 +28,12 @@ server/
 ├── middleware/          # Custom middleware
 │   └── auth.ts
 ├── types/              # TypeScript type definitions
-│   └── index.ts
+│   ├── index.ts
+│   ├── responses.ts
+│   └── README.md
 ├── dist/               # Compiled JavaScript (generated)
 ├── server.ts           # Main server file
+├── swagger.ts          # Swagger/OpenAPI configuration
 ├── tsconfig.json       # TypeScript configuration
 └── package.json
 ```
@@ -68,6 +72,19 @@ PORT=5000
   ```bash
   npm start
   ```
+
+## API Documentation
+
+Once the server is running, you can access the interactive API documentation:
+
+- **Swagger UI**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+- **OpenAPI JSON**: [http://localhost:5000/api-docs.json](http://localhost:5000/api-docs.json)
+
+The Swagger UI provides:
+- Interactive API testing
+- Complete request/response schemas
+- Authentication flow examples
+- Try-it-out functionality for all endpoints
 
 ## API Endpoints
 
@@ -111,6 +128,8 @@ The project uses:
 - **Axios** for HTTP requests
 - **CORS** for cross-origin resource sharing
 - **dotenv** for environment configuration
+- **Swagger** for API documentation
+- **swagger-jsdoc** & **swagger-ui-express** for OpenAPI generation
 
 ## License
 
