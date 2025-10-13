@@ -1,11 +1,16 @@
-const axios = require("axios");
+import { Response } from "express";
+import axios from "axios";
+import { AuthRequest, ErrorResponse } from "../types";
 
 const { CLIENT_ID, BASE_URL } = process.env;
 
 // @desc    Get all reciters
 // @route   POST /api/reciters
 // @access  Private (requires access token)
-const getAllReciters = async (req, res) => {
+export const getAllReciters = async (
+  req: AuthRequest,
+  res: Response<any | ErrorResponse>
+): Promise<void> => {
   try {
     const { language = "en" } = req.body;
     const response = await axios({
@@ -22,14 +27,23 @@ const getAllReciters = async (req, res) => {
     });
     res.status(200).json(response.data);
   } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.message });
+    const statusCode = axios.isAxiosError(error)
+      ? error.response?.status || 500
+      : 500;
+    const errorMessage = axios.isAxiosError(error)
+      ? error.message
+      : (error as Error).message;
+    res.status(statusCode).json({ error: errorMessage });
   }
 };
 
 // @desc    Get verses by rub and recitation
 // @route   POST /api/rub/:rub_number/recitation/:recitation_id
 // @access  Private (requires access token)
-const getVersesByRubAndRecitation = async (req, res) => {
+export const getVersesByRubAndRecitation = async (
+  req: AuthRequest,
+  res: Response<any | ErrorResponse>
+): Promise<void | Response<ErrorResponse>> => {
   try {
     const rubNumber = Number(req.params.rub_number);
     const recitationId = Number(req.params.recitation_id);
@@ -53,8 +67,12 @@ const getVersesByRubAndRecitation = async (req, res) => {
     });
     res.status(200).json(response.data);
   } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.message });
+    const statusCode = axios.isAxiosError(error)
+      ? error.response?.status || 500
+      : 500;
+    const errorMessage = axios.isAxiosError(error)
+      ? error.message
+      : (error as Error).message;
+    res.status(statusCode).json({ error: errorMessage });
   }
 };
-
-module.exports = { getAllReciters, getVersesByRubAndRecitation };

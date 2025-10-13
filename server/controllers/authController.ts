@@ -1,17 +1,22 @@
-const axios = require("axios");
+import { Request, Response } from "express";
+import axios from "axios";
+import { TokenResponse, ErrorResponse } from "../types";
 
 const { CLIENT_ID, CLIENT_SECRET, AUTH_URL } = process.env;
 
 // @desc    Get access token
 // @route   POST /api/token
 // @access  Public
-const getToken = async (req, res) => {
+export const getToken = async (
+  _req: Request,
+  res: Response<TokenResponse | ErrorResponse>
+): Promise<void> => {
   try {
     const auth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
       "base64"
     );
 
-    const response = await axios({
+    const response = await axios<TokenResponse>({
       method: "post",
       url: `${AUTH_URL}/oauth2/token`,
       headers: {
@@ -25,10 +30,8 @@ const getToken = async (req, res) => {
   } catch (error) {
     console.error(
       "Token request failed:",
-      error.response?.data || error.message
+      axios.isAxiosError(error) ? error.response?.data : (error as Error).message
     );
     res.status(500).json({ error: "Failed to get access token" });
   }
 };
-
-module.exports = { getToken };
