@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const { CLIENT_ID, CLIENT_SECRET, BASE_URL } = process.env;
+const { CLIENT_ID, CLIENT_SECRET, AUTH_URL, BASE_URL } = process.env;
 
 app.post("/api/token", async (req, res) => {
   try {
@@ -16,9 +16,9 @@ app.post("/api/token", async (req, res) => {
       "base64"
     );
 
-    const response = await await axios({
+    const response = await axios({
       method: "post",
-      url: `${BASE_URL}/oauth2/token`,
+      url: `${AUTH_URL}/oauth2/token`,
       headers: {
         Authorization: `Basic ${auth}`,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -33,6 +33,28 @@ app.post("/api/token", async (req, res) => {
       error.response?.data || error.message
     );
     res.status(500).json({ error: "Failed to get access token" });
+  }
+});
+
+app.post("/api/chapters", async (req, res) => {
+  try {
+    const { access_token: accessToken } = req.body;
+    if (!accessToken) {
+      return res.status(400).json({ error: "Access Token is required" });
+    }
+    const response = await axios({
+      method: "get",
+      url: `${BASE_URL}/content/api/v4/chapters`,
+      headers: {
+        Accept: "application/json",
+        "x-auth-token": accessToken,
+        "x-client-id": CLIENT_ID,
+      },
+    });
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error processing the request" });
   }
 });
 
