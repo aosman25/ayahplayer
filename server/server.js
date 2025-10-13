@@ -58,5 +58,30 @@ app.post("/api/chapters", async (req, res) => {
   }
 });
 
+app.post("/api/reciters", async (req, res) => {
+  try {
+    const { access_token: accessToken, language = "en" } = req.body;
+    if (!accessToken) {
+      return res.status(400).json({ error: "Access Token is required" });
+    }
+    const response = await axios({
+      method: "get",
+      url: `${BASE_URL}/content/api/v4/resources/recitations`,
+      headers: {
+        Accept: "application/json",
+        "x-auth-token": accessToken,
+        "x-client-id": CLIENT_ID,
+      },
+      params: {
+        language,
+      },
+    });
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error processing the request" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
