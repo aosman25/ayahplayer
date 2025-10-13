@@ -40,7 +40,7 @@ app.post("/api/chapters", async (req, res) => {
   try {
     const { access_token: accessToken } = req.body;
     if (!accessToken) {
-      res.status(400).json({ error: "Access Token is required" });
+      return res.status(400).json({ error: "Access Token is required" });
     }
     const response = await axios({
       method: "get",
@@ -53,7 +53,7 @@ app.post("/api/chapters", async (req, res) => {
     });
     res.status(200).json(response.data);
   } catch (error) {
-    res.status(error).json({ error: error.message });
+    res.status(error.response?.status || 500).json({ error: error.message });
   }
 });
 
@@ -61,7 +61,7 @@ app.post("/api/reciters", async (req, res) => {
   try {
     const { access_token: accessToken, language = "en" } = req.body;
     if (!accessToken) {
-      res.status(400).json({ error: "Access Token is required" });
+      return res.status(400).json({ error: "Access Token is required" });
     }
     const response = await axios({
       method: "get",
@@ -77,7 +77,7 @@ app.post("/api/reciters", async (req, res) => {
     });
     res.status(200).json(response.data);
   } catch (error) {
-    res.status(error.status).json({ error: error.message });
+    res.status(error.response?.status || 500).json({ error: error.message });
   }
 });
 
@@ -85,16 +85,16 @@ app.post("/api/rub/:rub_number/recitation/:recitation_id", async (req, res) => {
   try {
     const { access_token: accessToken } = req.body;
     if (!accessToken) {
-      res.status(400).json({ error: "Access Token is required" });
+      return res.status(400).json({ error: "Access Token is required" });
     }
     const rubNumber = Number(req.params.rub_number);
     const recitationId = Number(req.params.recitation_id);
     if (isNaN(rubNumber) || isNaN(recitationId)) {
-      res
+      return res
         .status(400)
         .json({ error: "Rub Number and Recitation ID must be numbers" });
-    } else if (1 > rubNumber && rubNumber > 240) {
-      res.status(400).json({ error: "Rub Number must be between 1 and 240" });
+    } else if (rubNumber < 1 || rubNumber > 240) {
+      return res.status(400).json({ error: "Rub Number must be between 1 and 240" });
     }
     const response = await axios({
       method: "get",
@@ -107,7 +107,7 @@ app.post("/api/rub/:rub_number/recitation/:recitation_id", async (req, res) => {
     });
     res.status(200).json(response.data);
   } catch (error) {
-    res.status(error.status).json({ error: error.message });
+    res.status(error.response?.status || 500).json({ error: error.message });
   }
 });
 
@@ -115,13 +115,13 @@ app.post("/api/verses/rub/:rub_number", async (req, res) => {
   try {
     const { access_token: accessToken } = req.body;
     if (!accessToken) {
-      res.status(400).json({ error: "Access Token is required" });
+      return res.status(400).json({ error: "Access Token is required" });
     }
     const rubNumber = Number(req.params.rub_number);
     if (isNaN(rubNumber)) {
-      res.status(400).json({ error: "Rub Number must be a valid number" });
-    } else if (1 > rubNumber && 240 < rubNumber) {
-      res.status(400).json({ error: "Rub Number must be between 1 and 240" });
+      return res.status(400).json({ error: "Rub Number must be a valid number" });
+    } else if (rubNumber < 1 || rubNumber > 240) {
+      return res.status(400).json({ error: "Rub Number must be between 1 and 240" });
     }
     const response = await axios({
       method: "get",
@@ -134,7 +134,7 @@ app.post("/api/verses/rub/:rub_number", async (req, res) => {
     });
     res.status(200).json(response.data);
   } catch (error) {
-    res.status(error.status).json({ error: error.message });
+    res.status(error.response?.status || 500).json({ error: error.message });
   }
 });
 
