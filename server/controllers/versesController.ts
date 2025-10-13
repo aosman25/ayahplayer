@@ -1,6 +1,7 @@
 import { Response } from "express";
 import axios from "axios";
 import { AuthRequest, ErrorResponse } from "../types";
+import { VersesResponse } from "../types/responses";
 
 const { CLIENT_ID, BASE_URL } = process.env;
 
@@ -9,7 +10,7 @@ const { CLIENT_ID, BASE_URL } = process.env;
 // @access  Private (requires access token)
 export const getVersesByRub = async (
   req: AuthRequest,
-  res: Response<any | ErrorResponse>
+  res: Response<VersesResponse | ErrorResponse>
 ): Promise<void | Response<ErrorResponse>> => {
   try {
     const rubNumber = Number(req.params.rub_number);
@@ -20,7 +21,7 @@ export const getVersesByRub = async (
       return res.status(400).json({ error: "Rub Number must be between 1 and 240" });
     }
 
-    const response = await axios({
+    const response = await axios<VersesResponse>({
       method: "get",
       url: `${BASE_URL}/content/api/v4/verses/by_rub/${rubNumber}`,
       headers: {

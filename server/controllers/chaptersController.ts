@@ -1,6 +1,7 @@
 import { Response } from "express";
 import axios from "axios";
 import { AuthRequest, ErrorResponse } from "../types";
+import { ChaptersResponse } from "../types/responses";
 
 const { CLIENT_ID, BASE_URL } = process.env;
 
@@ -9,10 +10,10 @@ const { CLIENT_ID, BASE_URL } = process.env;
 // @access  Private (requires access token)
 export const getAllChapters = async (
   req: AuthRequest,
-  res: Response<any | ErrorResponse>
+  res: Response<ChaptersResponse | ErrorResponse>
 ): Promise<void> => {
   try {
-    const response = await axios({
+    const response = await axios<ChaptersResponse>({
       method: "get",
       url: `${BASE_URL}/content/api/v4/chapters`,
       headers: {

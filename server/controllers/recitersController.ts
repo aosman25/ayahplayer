@@ -1,6 +1,7 @@
 import { Response } from "express";
 import axios from "axios";
 import { AuthRequest, ErrorResponse } from "../types";
+import { RecitersResponse, AudioFilesResponse } from "../types/responses";
 
 const { CLIENT_ID, BASE_URL } = process.env;
 
@@ -9,11 +10,11 @@ const { CLIENT_ID, BASE_URL } = process.env;
 // @access  Private (requires access token)
 export const getAllReciters = async (
   req: AuthRequest,
-  res: Response<any | ErrorResponse>
+  res: Response<RecitersResponse | ErrorResponse>
 ): Promise<void> => {
   try {
     const { language = "en" } = req.body;
-    const response = await axios({
+    const response = await axios<RecitersResponse>({
       method: "get",
       url: `${BASE_URL}/content/api/v4/resources/recitations`,
       headers: {
@@ -42,7 +43,7 @@ export const getAllReciters = async (
 // @access  Private (requires access token)
 export const getVersesByRubAndRecitation = async (
   req: AuthRequest,
-  res: Response<any | ErrorResponse>
+  res: Response<AudioFilesResponse | ErrorResponse>
 ): Promise<void | Response<ErrorResponse>> => {
   try {
     const rubNumber = Number(req.params.rub_number);
@@ -56,7 +57,7 @@ export const getVersesByRubAndRecitation = async (
       return res.status(400).json({ error: "Rub Number must be between 1 and 240" });
     }
 
-    const response = await axios({
+    const response = await axios<AudioFilesResponse>({
       method: "get",
       url: `${BASE_URL}/content/api/v4/recitations/${recitationId}/by_rub/${rubNumber}`,
       headers: {

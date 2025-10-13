@@ -29,3 +29,6 @@ export interface AuthRequestBody {
   access_token: string;
   language?: string;
 }
+
+// Re-export all response types for convenience
+export * from "./responses";
