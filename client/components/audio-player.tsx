@@ -1,0 +1,335 @@
+"use client"
+
+import { useState, useRef, useEffect, useMemo } from "react"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Loader2, Repeat } from "lucide-react"
+import type { Chapter } from "@/lib/api-client"
+import type { UthmaniVerse } from "@/lib/api-client"
+
+interface AudioPlayerProps {
+  startVerseKey: string
+  totalVerses: number
+  baseUrl: string
+  firstAudioUrl: string
+  chapters: Chapter[]
+  uthmaniVerses: UthmaniVerse[]
+}
+
+export function AudioPlayer({
+  startVerseKey,
+  totalVerses,
+  baseUrl,
+  firstAudioUrl,
+  chapters,
+  uthmaniVerses,
+}: AudioPlayerProps) {
+  const [startChapter, startVerse] = startVerseKey.split(":").map(Number)
+
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [isMuted, setIsMuted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [autoReplay, setAutoReplay] = useState(false)
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  const { actualBaseUrl, relativePath } = useMemo(() => {
+    if (!firstAudioUrl) return { actualBaseUrl: baseUrl, relativePath: "" }
+
+    let fullUrl = firstAudioUrl
+    if (firstAudioUrl.startsWith("//")) {
+      fullUrl = `https:${firstAudioUrl}`
+    } else if (!firstAudioUrl.startsWith("http://") && !firstAudioUrl.startsWith("https://")) {
+      fullUrl = `${baseUrl}${firstAudioUrl}`
+    }
+
+    // Parse the URL to extract base and path
+    try {
+      const urlObj = new URL(fullUrl)
+      const extractedBase = `${urlObj.protocol}//${urlObj.host}/`
+      const pathname = urlObj.pathname
+      const lastSlashIndex = pathname.lastIndexOf("/")
+      const path = pathname.substring(0, lastSlashIndex + 1)
+
+      return { actualBaseUrl: extractedBase, relativePath: path }
+    } catch (err) {
+      const lastSlashIndex = firstAudioUrl.lastIndexOf("/")
+      const path = firstAudioUrl.substring(0, lastSlashIndex + 1)
+      return { actualBaseUrl: baseUrl, relativePath: path }
+    }
+  }, [firstAudioUrl, baseUrl])
+
+  const currentVerseInfo = useMemo(() => {
+    let currentChapter = startChapter
+    let currentVerse = startVerse + currentIndex
+
+    // Navigate through chapters if we exceed verse count
+    while (currentChapter <= 114 && chapters[currentChapter - 1]) {
+      const chapterVerseCount = chapters[currentChapter - 1].verses_count
+      if (currentVerse <= chapterVerseCount) {
+        break
+      }
+      currentVerse -= chapterVerseCount
+      currentChapter++
+    }
+
+    const chapterStr = currentChapter.toString().padStart(3, "0")
+    const verseStr = currentVerse.toString().padStart(3, "0")
+    const audioUrl = `${actualBaseUrl}${relativePath}${chapterStr}${verseStr}.mp3`
+    const verseKey = `${currentChapter}:${currentVerse}`
+
+    return { chapter: currentChapter, verse: currentVerse, audioUrl, verseKey }
+  }, [currentIndex, startChapter, startVerse, chapters, actualBaseUrl, relativePath])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    setIsLoading(true)
+    audio.src = currentVerseInfo.audioUrl
+    audio.load()
+
+    if (isPlaying) {
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          setIsPlaying(false)
+          setIsLoading(false)
+        })
+      }
+    }
+  }, [currentIndex, currentVerseInfo.audioUrl])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime)
+    const handleDurationChange = () => setDuration(audio.duration)
+    const handleLoadStart = () => setIsLoading(true)
+    const handleCanPlay = () => {
+      setIsLoading(false)
+    }
+    const handleEnded = () => {
+      if (currentIndex < totalVerses - 1) {
+        setCurrentIndex((prev) => prev + 1)
+        setIsPlaying(true)
+      } else if (autoReplay) {
+        setCurrentIndex(0)
+        setIsPlaying(true)
+      } else {
+        setIsPlaying(false)
+      }
+    }
+
+    audio.addEventListener("timeupdate", handleTimeUpdate)
+    audio.addEventListener("durationchange", handleDurationChange)
+    audio.addEventListener("ended", handleEnded)
+    audio.addEventListener("loadstart", handleLoadStart)
+    audio.addEventListener("canplay", handleCanPlay)
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate)
+      audio.removeEventListener("durationchange", handleDurationChange)
+      audio.removeEventListener("ended", handleEnded)
+      audio.removeEventListener("loadstart", handleLoadStart)
+      audio.removeEventListener("canplay", handleCanPlay)
+    }
+  }, [currentIndex, totalVerses, autoReplay])
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume
+    }
+  }, [volume, isMuted])
+
+  const togglePlayPause = () => {
+    if (!audioRef.current) return
+
+    if (isPlaying) {
+      audioRef.current.pause()
+      setIsPlaying(false)
+    } else {
+      const playPromise = audioRef.current.play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true)
+          })
+          .catch((error) => {
+            setIsPlaying(false)
+          })
+      }
+    }
+  }
+
+  const handleNext = () => {
+    if (currentIndex < totalVerses - 1) {
+      setCurrentIndex(currentIndex + 1)
+      setIsPlaying(true)
+    }
+  }
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1)
+      setIsPlaying(true)
+    }
+  }
+
+  const handleSeek = (value: number[]) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = value[0]
+      setCurrentTime(value[0])
+    }
+  }
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0])
+    if (value[0] > 0) {
+      setIsMuted(false)
+    }
+  }
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted)
+  }
+
+  const toggleAutoReplay = () => {
+    setAutoReplay(!autoReplay)
+  }
+
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return "0:00"
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`
+  }
+
+  const getChapterName = () => {
+    if (chapters.length === 0) return ""
+    const chapterIndex = currentVerseInfo.chapter - 1
+    if (chapterIndex >= 0 && chapterIndex < chapters.length) {
+      return chapters[chapterIndex].name_simple
+    }
+    return ""
+  }
+
+  const getCurrentUthmaniText = () => {
+    const verse = uthmaniVerses.find((v) => v.verse_key === currentVerseInfo.verseKey)
+    return verse?.text_uthmani || ""
+  }
+
+  if (!startVerseKey || totalVerses === 0) {
+    return (
+      <div className="text-center text-muted-foreground py-12">
+        <p className="text-lg">Select a reciter and segment to start listening</p>
+      </div>
+    )
+  }
+
+  const uthmaniText = getCurrentUthmaniText()
+
+  return (
+    <div className="space-y-8">
+      <audio ref={audioRef} preload="auto" />
+
+      {/* Uthmani text display */}
+      {uthmaniText && (
+        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-8 md:p-10 border-2 border-primary/20 shadow-inner">
+          <div
+            className="text-3xl md:text-4xl lg:text-5xl leading-loose text-center font-arabic"
+            style={{ direction: "rtl", fontFamily: "'Amiri Quran', 'Traditional Arabic', serif" }}
+          >
+            {uthmaniText}
+          </div>
+        </div>
+      )}
+
+      {/* Current verse info */}
+      <div className="text-center space-y-3 py-4">
+        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Now Playing</div>
+        {getChapterName() && <div className="text-xl font-bold text-primary">{getChapterName()}</div>}
+        <div className="text-2xl font-semibold">Verse {currentVerseInfo.verseKey}</div>
+        <div className="text-sm text-muted-foreground">
+          Verse {currentIndex + 1} of {totalVerses}
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="space-y-3">
+        <Slider
+          value={[currentTime]}
+          max={duration || 100}
+          step={0.1}
+          onValueChange={handleSeek}
+          className="w-full"
+          disabled={isLoading}
+        />
+        <div className="flex justify-between text-sm font-medium text-muted-foreground">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center justify-center gap-4">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 bg-transparent"
+          onClick={handlePrevious}
+          disabled={currentIndex === 0 || isLoading}
+        >
+          <SkipBack className="h-5 w-5" />
+        </Button>
+
+        <Button size="icon" className="h-16 w-16 shadow-lg" onClick={togglePlayPause} disabled={isLoading}>
+          {isLoading ? (
+            <Loader2 className="h-6 w-6 animate-spin" />
+          ) : isPlaying ? (
+            <Pause className="h-6 w-6" />
+          ) : (
+            <Play className="h-6 w-6 ml-1" />
+          )}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 bg-transparent"
+          onClick={handleNext}
+          disabled={currentIndex === totalVerses - 1 || isLoading}
+        >
+          <SkipForward className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Volume control with autoreplay button */}
+      <div className="flex items-center gap-4 px-2">
+        <Button variant="ghost" size="icon" onClick={toggleMute} className="shrink-0">
+          {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+        </Button>
+        <Slider
+          value={[isMuted ? 0 : volume]}
+          max={1}
+          step={0.01}
+          onValueChange={handleVolumeChange}
+          className="w-full"
+        />
+        <Button
+          variant={autoReplay ? "default" : "outline"}
+          size="icon"
+          onClick={toggleAutoReplay}
+          title={autoReplay ? "Autoreplay enabled" : "Autoreplay disabled"}
+          className="shrink-0"
+        >
+          <Repeat className="h-5 w-5" />
+        </Button>
+      </div>
+    </div>
+  )
+}
