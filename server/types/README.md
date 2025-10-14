@@ -9,7 +9,15 @@ This directory contains TypeScript type definitions for all API responses.
 
 ## Response Type Definitions
 
-### Chapters API (`/api/chapters`)
+### Authentication API (`GET /api/token`)
+
+```typescript
+interface TokenResponse {
+  access_token: string;
+}
+```
+
+### Chapters API (`GET /api/chapters`)
 
 ```typescript
 interface ChaptersResponse {
@@ -30,7 +38,7 @@ interface Chapter {
 }
 ```
 
-### Reciters API (`/api/reciters`)
+### Reciters API (`GET /api/reciters`)
 
 ```typescript
 interface RecitersResponse {
@@ -45,7 +53,12 @@ interface Recitation {
 }
 ```
 
-### Audio Files API (`/api/reciters/rub/:rub_number/recitation/:recitation_id`)
+### Audio Recitations API
+
+Available endpoints:
+- `GET /api/reciters/recitations/:recitation_id/by_juz/:juz_number`
+- `GET /api/reciters/recitations/:recitation_id/by_hizb/:hizb_number`
+- `GET /api/reciters/recitations/:recitation_id/by_rub/:rub_number`
 
 ```typescript
 interface AudioFilesResponse {
@@ -59,27 +72,25 @@ interface AudioFile {
 }
 ```
 
-### Verses API (`/api/verses/rub/:rub_number`)
+### Verses API (`GET /api/verses/uthmani`)
+
+Returns Uthmani script of Quran verses with optional filtering via query parameters:
+- `chapter_number` (1-114): Filter by chapter/surah
+- `juz_number` (1-30): Filter by juz
+- `page_number` (1-604): Filter by Madani Mushaf page
+- `hizb_number` (1-60): Filter by hizb
+- `rub_el_hizb_number` (1-240): Filter by Rub el Hizb
+- `verse_key` (e.g., "1:1"): Filter by specific verse
 
 ```typescript
 interface VersesResponse {
-  verses: Verse[];
-  pagination: Pagination;
+  verses: UthmaniVerse[];
 }
 
-interface Verse {
+interface UthmaniVerse {
   id: number;
-  verse_number: number;
-  page_number: number;
   verse_key: string;
-  juz_number: number;
-  hizb_number: number;
-  rub_el_hizb_number: number;
-  sajdah_type: string | null;
-  sajdah_number: number | null;
-  words: Word[];
-  translations: Translation[];
-  tafsirs: Tafsir[];
+  text_uthmani: string;
 }
 ```
 
