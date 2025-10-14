@@ -106,7 +106,15 @@ The Swagger UI provides:
   - Parameters: `rub_number` (1-240), `recitation_id`
 
 ### Verses
-- `GET /api/verses/rub/:rub_number` - Get verses by rub number (requires token)
+- `GET /api/verses/uthmani` - Get Uthmani script of verses with optional filters (requires token)
+  - Query Parameters (all optional):
+    - `chapter_number` (1-114): Filter by specific chapter/surah
+    - `juz_number` (1-30): Filter by specific juz
+    - `page_number` (1-604): Filter by Madani Mushaf page number
+    - `hizb_number` (1-60): Filter by specific hizb
+    - `rub_el_hizb_number` (1-240): Filter by specific Rub el Hizb
+    - `verse_key` (e.g., "1:1"): Filter by specific verse
+  - Leave all parameters blank to fetch the entire Quran
 
 ## Authentication
 
@@ -130,19 +138,27 @@ curl -X GET http://localhost:5000/api/chapters \
 curl -X GET "http://localhost:5000/api/reciters?language=ar" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-# 4. Get verses by rub number
-curl -X GET http://localhost:5000/api/verses/rub/1 \
+# 4. Get Uthmani script verses by chapter
+curl -X GET "http://localhost:5000/api/verses/uthmani?chapter_number=1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-# 5. Get audio files by juz and recitation
+# 5. Get Uthmani script verses by page
+curl -X GET "http://localhost:5000/api/verses/uthmani?page_number=1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# 6. Get Uthmani script of specific verse
+curl -X GET "http://localhost:5000/api/verses/uthmani?verse_key=1:1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# 7. Get audio files by juz and recitation
 curl -X GET http://localhost:5000/api/reciters/recitations/7/by_juz/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-# 6. Get audio files by hizb and recitation
+# 8. Get audio files by hizb and recitation
 curl -X GET http://localhost:5000/api/reciters/recitations/7/by_hizb/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-# 7. Get audio files by rub and recitation
+# 9. Get audio files by rub and recitation
 curl -X GET http://localhost:5000/api/reciters/recitations/7/by_rub/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
@@ -174,16 +190,34 @@ const recitersResponse = await fetch('http://localhost:5000/api/reciters?languag
 });
 const reciters = await recitersResponse.json();
 
-// 4. Get verses by rub number
-const versesResponse = await fetch('http://localhost:5000/api/verses/rub/1', {
+// 4. Get Uthmani script verses by chapter
+const versesByChapterResponse = await fetch('http://localhost:5000/api/verses/uthmani?chapter_number=1', {
   method: 'GET',
   headers: {
     'Authorization': `Bearer ${access_token}`
   }
 });
-const verses = await versesResponse.json();
+const versesByChapter = await versesByChapterResponse.json();
 
-// 5. Get audio files by juz and recitation
+// 5. Get Uthmani script verses by page
+const versesByPageResponse = await fetch('http://localhost:5000/api/verses/uthmani?page_number=1', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${access_token}`
+  }
+});
+const versesByPage = await versesByPageResponse.json();
+
+// 6. Get Uthmani script of specific verse
+const specificVerseResponse = await fetch('http://localhost:5000/api/verses/uthmani?verse_key=1:1', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${access_token}`
+  }
+});
+const specificVerse = await specificVerseResponse.json();
+
+// 7. Get audio files by juz and recitation
 const juzAudioResponse = await fetch('http://localhost:5000/api/reciters/recitations/7/by_juz/1', {
   method: 'GET',
   headers: {
@@ -192,7 +226,7 @@ const juzAudioResponse = await fetch('http://localhost:5000/api/reciters/recitat
 });
 const juzAudioFiles = await juzAudioResponse.json();
 
-// 6. Get audio files by hizb and recitation
+// 8. Get audio files by hizb and recitation
 const hizbAudioResponse = await fetch('http://localhost:5000/api/reciters/recitations/7/by_hizb/1', {
   method: 'GET',
   headers: {
@@ -201,7 +235,7 @@ const hizbAudioResponse = await fetch('http://localhost:5000/api/reciters/recita
 });
 const hizbAudioFiles = await hizbAudioResponse.json();
 
-// 7. Get audio files by rub and recitation
+// 9. Get audio files by rub and recitation
 const rubAudioResponse = await fetch('http://localhost:5000/api/reciters/recitations/7/by_rub/1', {
   method: 'GET',
   headers: {

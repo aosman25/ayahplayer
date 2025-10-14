@@ -200,111 +200,10 @@ const options: swaggerJsdoc.Options = {
             },
           },
         },
-        Word: {
+        UthmaniVerse: {
           type: "object",
           properties: {
             id: {
-              type: "number",
-              example: 1,
-            },
-            position: {
-              type: "number",
-              example: 1,
-            },
-            audio_url: {
-              type: "string",
-              example: "wbw/001_001_001.mp3",
-            },
-            char_type_name: {
-              type: "string",
-              example: "word",
-            },
-            line_number: {
-              type: "number",
-              example: 2,
-            },
-            page_number: {
-              type: "number",
-              example: 1,
-            },
-            code_v1: {
-              type: "string",
-              example: "&#xfb51;",
-            },
-            translation: {
-              type: "object",
-              properties: {
-                text: {
-                  type: "string",
-                  example: "In (the) name",
-                },
-                language_name: {
-                  type: "string",
-                  example: "english",
-                },
-              },
-            },
-            transliteration: {
-              type: "object",
-              properties: {
-                text: {
-                  type: "string",
-                  example: "bis'mi",
-                },
-                language_name: {
-                  type: "string",
-                  example: "english",
-                },
-              },
-            },
-          },
-        },
-        Translation: {
-          type: "object",
-          properties: {
-            resource_id: {
-              type: "number",
-              example: 131,
-            },
-            text: {
-              type: "string",
-              example: "In the Name of Allah—the Most Compassionate, Most Merciful.",
-            },
-          },
-        },
-        Tafsir: {
-          type: "object",
-          properties: {
-            id: {
-              type: "number",
-              example: 82641,
-            },
-            language_name: {
-              type: "string",
-              example: "english",
-            },
-            name: {
-              type: "string",
-              example: "Tafsir Ibn Kathir",
-            },
-            text: {
-              type: "string",
-              example: "<h2 class=\"title\">Which was revealed in Makkah</h2>",
-            },
-          },
-        },
-        Verse: {
-          type: "object",
-          properties: {
-            id: {
-              type: "number",
-              example: 1,
-            },
-            verse_number: {
-              type: "number",
-              example: 1,
-            },
-            page_number: {
               type: "number",
               example: 1,
             },
@@ -312,45 +211,9 @@ const options: swaggerJsdoc.Options = {
               type: "string",
               example: "1:1",
             },
-            juz_number: {
-              type: "number",
-              example: 1,
-            },
-            hizb_number: {
-              type: "number",
-              example: 1,
-            },
-            rub_el_hizb_number: {
-              type: "number",
-              example: 1,
-            },
-            sajdah_type: {
+            text_uthmani: {
               type: "string",
-              nullable: true,
-              example: null,
-            },
-            sajdah_number: {
-              type: "number",
-              nullable: true,
-              example: null,
-            },
-            words: {
-              type: "array",
-              items: {
-                $ref: "#/components/schemas/Word",
-              },
-            },
-            translations: {
-              type: "array",
-              items: {
-                $ref: "#/components/schemas/Translation",
-              },
-            },
-            tafsirs: {
-              type: "array",
-              items: {
-                $ref: "#/components/schemas/Tafsir",
-              },
+              example: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
             },
           },
         },
@@ -360,11 +223,8 @@ const options: swaggerJsdoc.Options = {
             verses: {
               type: "array",
               items: {
-                $ref: "#/components/schemas/Verse",
+                $ref: "#/components/schemas/UthmaniVerse",
               },
-            },
-            pagination: {
-              $ref: "#/components/schemas/Pagination",
             },
           },
         },

@@ -53,53 +53,13 @@ export interface AudioFilesResponse {
   pagination: Pagination;
 }
 
-// Verses endpoint types
-export interface Word {
+// Verses endpoint types (Uthmani script)
+export interface UthmaniVerse {
   id: number;
-  position: number;
-  audio_url: string;
-  char_type_name: string;
-  line_number: number;
-  page_number: number;
-  code_v1: string;
-  translation: {
-    text: string;
-    language_name: string;
-  };
-  transliteration: {
-    text: string;
-    language_name: string;
-  };
-}
-
-export interface Translation {
-  resource_id: number;
-  text: string;
-}
-
-export interface Tafsir {
-  id: number;
-  language_name: string;
-  name: string;
-  text: string;
-}
-
-export interface Verse {
-  id: number;
-  verse_number: number;
-  page_number: number;
   verse_key: string;
-  juz_number: number;
-  hizb_number: number;
-  rub_el_hizb_number: number;
-  sajdah_type: string | null;
-  sajdah_number: number | null;
-  words: Word[];
-  translations: Translation[];
-  tafsirs: Tafsir[];
+  text_uthmani: string;
 }
 
 export interface VersesResponse {
-  verses: Verse[];
-  pagination: Pagination;
+  verses: UthmaniVerse[];
 }
