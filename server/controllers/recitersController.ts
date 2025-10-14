@@ -6,14 +6,14 @@ import { RecitersResponse, AudioFilesResponse } from "../types/responses";
 const { CLIENT_ID, BASE_URL } = process.env;
 
 // @desc    Get all reciters
-// @route   POST /api/reciters
+// @route   GET /api/reciters
 // @access  Private (requires access token)
 export const getAllReciters = async (
   req: AuthRequest,
   res: Response<RecitersResponse | ErrorResponse>
 ): Promise<void> => {
   try {
-    const { language = "en" } = req.body;
+    const { language = "en" } = req.query;
     const response = await axios<RecitersResponse>({
       method: "get",
       url: `${BASE_URL}/content/api/v4/resources/recitations`,
@@ -39,7 +39,7 @@ export const getAllReciters = async (
 };
 
 // @desc    Get verses by rub and recitation
-// @route   POST /api/rub/:rub_number/recitation/:recitation_id
+// @route   GET /api/rub/:rub_number/recitation/:recitation_id
 // @access  Private (requires access token)
 export const getVersesByRubAndRecitation = async (
   req: AuthRequest,

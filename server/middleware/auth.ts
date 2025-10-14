@@ -1,20 +1,28 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest, ErrorResponse } from "../types";
 
-// Middleware to check for access token
+// Middleware to check for access token in Authorization header
 export const requireAccessToken = (
   req: AuthRequest,
   res: Response<ErrorResponse>,
   next: NextFunction
 ): void | Response<ErrorResponse> => {
-  if (!req.body) {
-    return res.status(400).json({ error: "Request body is required" });
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: "Authorization header is required" });
   }
 
-  const { access_token: accessToken } = req.body;
+  // Check if it starts with "Bearer "
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Authorization header must start with 'Bearer '" });
+  }
+
+  // Extract token after "Bearer "
+  const accessToken = authHeader.substring(7);
 
   if (!accessToken) {
-    return res.status(401).json({ error: "Access Token is required" });
+    return res.status(401).json({ error: "Access token is required" });
   }
 
   req.accessToken = accessToken;

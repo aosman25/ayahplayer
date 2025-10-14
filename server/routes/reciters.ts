@@ -7,27 +7,21 @@ const router = express.Router();
 /**
  * @openapi
  * /api/reciters:
- *   post:
+ *   get:
  *     tags:
  *       - Reciters
  *     summary: Get all Quran reciters
  *     description: Retrieve a list of all available Quran reciters and their recitation styles
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - access_token
- *             properties:
- *               access_token:
- *                 type: string
- *                 description: OAuth2 access token
- *               language:
- *                 type: string
- *                 default: en
- *                 description: Language code for translated names
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: language
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: en
+ *         description: Language code for translated names
  *     responses:
  *       200:
  *         description: Successfully retrieved reciters
@@ -36,7 +30,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/RecitersResponse'
  *       401:
- *         description: Access token is required
+ *         description: Authorization header is missing or invalid
  *         content:
  *           application/json:
  *             schema:
@@ -48,16 +42,18 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/", requireAccessToken, getAllReciters);
+router.get("/", requireAccessToken, getAllReciters);
 
 /**
  * @openapi
  * /api/reciters/rub/{rub_number}/recitation/{recitation_id}:
- *   post:
+ *   get:
  *     tags:
  *       - Reciters
  *     summary: Get audio files for verses by rub and recitation
  *     description: Retrieve audio file URLs for verses in a specific rub with a specific recitation
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: rub_number
@@ -73,18 +69,6 @@ router.post("/", requireAccessToken, getAllReciters);
  *         schema:
  *           type: integer
  *         description: Recitation ID from /api/reciters
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - access_token
- *             properties:
- *               access_token:
- *                 type: string
- *                 description: OAuth2 access token
  *     responses:
  *       200:
  *         description: Successfully retrieved audio files
@@ -99,7 +83,7 @@ router.post("/", requireAccessToken, getAllReciters);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
- *         description: Access token is required
+ *         description: Authorization header is missing or invalid
  *         content:
  *           application/json:
  *             schema:
@@ -111,6 +95,6 @@ router.post("/", requireAccessToken, getAllReciters);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/rub/:rub_number/recitation/:recitation_id", requireAccessToken, getVersesByRubAndRecitation);
+router.get("/rub/:rub_number/recitation/:recitation_id", requireAccessToken, getVersesByRubAndRecitation);
 
 export default router;

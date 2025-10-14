@@ -103,12 +103,39 @@ The Swagger UI provides:
 
 ## Authentication
 
-All endpoints (except `/api/token`) require an access token in the request body:
+All endpoints (except `/api/token`) require an access token in the `Authorization` header using the Bearer scheme:
 
-```json
-{
-  "access_token": "your_token_here"
-}
+```http
+Authorization: Bearer your_token_here
+```
+
+### Example using curl:
+
+```bash
+# 1. Get access token
+curl -X POST http://localhost:5000/api/token
+
+# 2. Use token in subsequent requests
+curl -X POST http://localhost:5000/api/chapters \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Example using JavaScript/Fetch:
+
+```javascript
+// Get token
+const tokenResponse = await fetch('http://localhost:5000/api/token', {
+  method: 'POST'
+});
+const { access_token } = await tokenResponse.json();
+
+// Use token
+const response = await fetch('http://localhost:5000/api/chapters', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${access_token}`
+  }
+});
 ```
 
 ## Type Safety

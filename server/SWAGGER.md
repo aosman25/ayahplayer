@@ -27,16 +27,19 @@ To test protected endpoints:
    - Click "Execute"
    - Copy the `access_token` from the response
 
-2. **Use Token in Protected Endpoints**:
+2. **Authorize with Token**:
+   - Click the **"Authorize"** button at the top of the page (or the lock icon 🔒)
+   - In the dialog, enter: `Bearer YOUR_ACCESS_TOKEN` (or just the token, Swagger will add "Bearer" automatically)
+   - Click "Authorize"
+   - Click "Close"
+
+3. **Use Protected Endpoints**:
+   - All subsequent requests will now include the Authorization header automatically
    - Expand any protected endpoint (e.g., `/api/chapters`)
    - Click "Try it out"
-   - In the request body, paste:
-   ```json
-   {
-     "access_token": "your_copied_token_here"
-   }
-   ```
-   - Click "Execute"
+   - Click "Execute" (no need to manually add the token!)
+
+**Note**: The access token is now sent in the `Authorization` header using the Bearer scheme, not in the request body.
 
 ### 3. Schema Reference
 

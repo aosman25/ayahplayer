@@ -6,7 +6,7 @@ const router = express.Router();
 /**
  * @openapi
  * /api/token:
- *   post:
+ *   get:
  *     tags:
  *       - Authentication
  *     summary: Get OAuth2 access token
@@ -25,6 +25,6 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/token", getToken);
+router.get("/token", getToken);
 
 export default router;

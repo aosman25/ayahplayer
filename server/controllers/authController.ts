@@ -5,7 +5,7 @@ import { TokenResponse, ErrorResponse } from "../types";
 const { CLIENT_ID, CLIENT_SECRET, AUTH_URL } = process.env;
 
 // @desc    Get access token
-// @route   POST /api/token
+// @route   GET /api/token
 // @access  Public
 export const getToken = async (
   _req: Request,

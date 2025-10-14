@@ -7,11 +7,13 @@ const router = express.Router();
 /**
  * @openapi
  * /api/verses/rub/{rub_number}:
- *   post:
+ *   get:
  *     tags:
  *       - Verses
  *     summary: Get verses by rub number
  *     description: Retrieve all verses (Ayahs) in a specific rub with translations, transliterations, and tafsirs
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: rub_number
@@ -21,18 +23,6 @@ const router = express.Router();
  *           minimum: 1
  *           maximum: 240
  *         description: Rub number (1-240). The Quran is divided into 240 rubs.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - access_token
- *             properties:
- *               access_token:
- *                 type: string
- *                 description: OAuth2 access token from /api/token
  *     responses:
  *       200:
  *         description: Successfully retrieved verses
@@ -47,7 +37,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
- *         description: Access token is required
+ *         description: Authorization header is missing or invalid
  *         content:
  *           application/json:
  *             schema:
@@ -59,6 +49,6 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/rub/:rub_number", requireAccessToken, getVersesByRub);
+router.get("/rub/:rub_number", requireAccessToken, getVersesByRub);
 
 export default router;

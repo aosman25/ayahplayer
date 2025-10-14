@@ -7,23 +7,13 @@ const router = express.Router();
 /**
  * @openapi
  * /api/chapters:
- *   post:
+ *   get:
  *     tags:
  *       - Chapters
  *     summary: Get all Quran chapters
  *     description: Retrieve a list of all chapters (Surahs) in the Quran with their metadata
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - access_token
- *             properties:
- *               access_token:
- *                 type: string
- *                 description: OAuth2 access token from /api/token
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully retrieved chapters
@@ -31,14 +21,8 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ChaptersResponse'
- *       400:
- *         description: Request body is required
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
- *         description: Access token is required
+ *         description: Authorization header is missing or invalid
  *         content:
  *           application/json:
  *             schema:
@@ -50,6 +34,6 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/", requireAccessToken, getAllChapters);
+router.get("/", requireAccessToken, getAllChapters);
 
 export default router;
