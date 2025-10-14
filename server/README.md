@@ -89,17 +89,19 @@ The Swagger UI provides:
 ## API Endpoints
 
 ### Authentication
-- `POST /api/token` - Get OAuth2 access token (public)
+- `GET /api/token` - Get OAuth2 access token (public)
 
 ### Chapters
-- `POST /api/chapters` - Get all Quran chapters (requires token)
+- `GET /api/chapters` - Get all Quran chapters (requires token)
 
 ### Reciters
-- `POST /api/reciters` - Get all reciters (requires token)
-- `POST /api/reciters/rub/:rub_number/recitation/:recitation_id` - Get verses by rub and recitation (requires token)
+- `GET /api/reciters?language=en` - Get all reciters (requires token)
+  - Query Parameters:
+    - `language` (optional): Language code for translated names (default: "en")
+- `GET /api/reciters/rub/:rub_number/recitation/:recitation_id` - Get audio files for verses by rub and recitation (requires token)
 
 ### Verses
-- `POST /api/verses/rub/:rub_number` - Get verses by rub number (requires token)
+- `GET /api/verses/rub/:rub_number` - Get verses by rub number (requires token)
 
 ## Authentication
 
@@ -113,29 +115,69 @@ Authorization: Bearer your_token_here
 
 ```bash
 # 1. Get access token
-curl -X POST http://localhost:5000/api/token
+curl -X GET http://localhost:5000/api/token
 
 # 2. Use token in subsequent requests
-curl -X POST http://localhost:5000/api/chapters \
+curl -X GET http://localhost:5000/api/chapters \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# 3. Get reciters with language parameter
+curl -X GET "http://localhost:5000/api/reciters?language=ar" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# 4. Get verses by rub number
+curl -X GET http://localhost:5000/api/verses/rub/1 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# 5. Get audio files by rub and recitation
+curl -X GET http://localhost:5000/api/reciters/rub/1/recitation/7 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### Example using JavaScript/Fetch:
 
 ```javascript
-// Get token
+// 1. Get token
 const tokenResponse = await fetch('http://localhost:5000/api/token', {
-  method: 'POST'
+  method: 'GET'
 });
 const { access_token } = await tokenResponse.json();
 
-// Use token
-const response = await fetch('http://localhost:5000/api/chapters', {
-  method: 'POST',
+// 2. Get chapters
+const chaptersResponse = await fetch('http://localhost:5000/api/chapters', {
+  method: 'GET',
   headers: {
     'Authorization': `Bearer ${access_token}`
   }
 });
+const chapters = await chaptersResponse.json();
+
+// 3. Get reciters with language parameter
+const recitersResponse = await fetch('http://localhost:5000/api/reciters?language=ar', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${access_token}`
+  }
+});
+const reciters = await recitersResponse.json();
+
+// 4. Get verses by rub number
+const versesResponse = await fetch('http://localhost:5000/api/verses/rub/1', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${access_token}`
+  }
+});
+const verses = await versesResponse.json();
+
+// 5. Get audio files by rub and recitation
+const audioResponse = await fetch('http://localhost:5000/api/reciters/rub/1/recitation/7', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${access_token}`
+  }
+});
+const audioFiles = await audioResponse.json();
 ```
 
 ## Type Safety
