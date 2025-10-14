@@ -4,6 +4,12 @@
 
 AyahPlayer is a modern web application that allows users to listen to the Holy Quran with beautiful Uthmani script display. Choose from various reciters and navigate through the Quran by chapter, juz, hizb, or rub el hizb.
 
+## 🌟 Demo
+
+**🔗 [Live Demo](https://ayahplayer.netlify.app/)**
+
+Try out AyahPlayer now at [ayahplayer.netlify.app](https://ayahplayer.netlify.app/) - no installation required!
+
 ## ✨ Features
 
 - 🎙️ **Multiple Reciters**: Choose from a wide selection of renowned Quran reciters
