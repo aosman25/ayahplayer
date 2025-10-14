@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== "production") {
   import("swagger-ui-express").then((swaggerUi) => {
     import("./swagger").then(({ swaggerSpec }) => {
       app.use("/api-docs", swaggerUi.default.serve, swaggerUi.default.setup(swaggerSpec, {
-        customSiteTitle: "QuranHifz API Documentation",
+        customSiteTitle: "AyahPlayer API Documentation",
         customCss: ".swagger-ui .topbar { display: none }",
       }));
 

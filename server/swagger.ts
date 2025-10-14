@@ -4,9 +4,9 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "QuranHifz API",
+      title: "AyahPlayer API",
       version: "1.0.0",
-      description: "RESTful API for QuranHifz application - Access Quran chapters, verses, reciters, and audio recitations",
+      description: "RESTful API for AyahPlayer application - Listen to the Holy Quran Ayah By Ayah. Access Quran chapters, ayahs, reciters, and audio recitations",
       contact: {
         name: "API Support",
       },
@@ -245,7 +245,7 @@ const options: swaggerJsdoc.Options = {
       },
       {
         name: "Verses",
-        description: "Quran verses (Ayahs)",
+        description: "Quran ayahs",
       },
     ],
   },

@@ -18,12 +18,12 @@ export default function Home() {
   const [selectedStyle, setSelectedStyle] = useState<string>("")
   const [listeningMode, setListeningMode] = useState<ListeningMode>("chapter")
   const [selectedNumber, setSelectedNumber] = useState<number>()
-  const [startVerseKey, setStartVerseKey] = useState<string>("")
-  const [totalVerses, setTotalVerses] = useState<number>(0)
+  const [startAyahKey, setStartAyahKey] = useState<string>("")
+  const [totalAyahs, setTotalAyahs] = useState<number>(0)
   const [firstAudioUrl, setFirstAudioUrl] = useState<string>("")
   const [reciterPath, setReciterPath] = useState<string>("")
-  const [uthmaniVerses, setUthmaniVerses] = useState<UthmaniVerse[]>([])
-  const [currentVerseKey, setCurrentVerseKey] = useState<string>("")
+  const [uthmaniAyahs, setUthmaniAyahs] = useState<UthmaniVerse[]>([])
+  const [currentAyahKey, setCurrentAyahKey] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -43,8 +43,8 @@ export default function Home() {
     setSelectedReciterId(reciterId)
     setSelectedReciterName(reciterName)
     setSelectedStyle(style)
-    setStartVerseKey("")
-    setTotalVerses(0)
+    setStartAyahKey("")
+    setTotalAyahs(0)
     setFirstAudioUrl("")
     setReciterPath("")
   }
@@ -52,15 +52,15 @@ export default function Home() {
   const handleModeChange = (mode: ListeningMode) => {
     setListeningMode(mode)
     setSelectedNumber(undefined)
-    setStartVerseKey("")
-    setTotalVerses(0)
+    setStartAyahKey("")
+    setTotalAyahs(0)
     setFirstAudioUrl("")
   }
 
   const handleNumberChange = (num: number) => {
     setSelectedNumber(num)
-    setStartVerseKey("")
-    setTotalVerses(0)
+    setStartAyahKey("")
+    setTotalAyahs(0)
     setFirstAudioUrl("")
   }
 
@@ -108,21 +108,21 @@ export default function Home() {
         }
 
         // Set up chapter playback
-        setStartVerseKey(`${selectedNumber}:1`)
-        setTotalVerses(chapter.verses_count)
+        setStartAyahKey(`${selectedNumber}:1`)
+        setTotalAyahs(chapter.verses_count)
         const chapterPadded = selectedNumber.toString().padStart(3, "0")
-        const versePadded = "001"
+        const ayahPadded = "001"
 
         // If pathToUse starts with http:// or https://, it's already a full URL from a different domain
         if (pathToUse.startsWith("http://") || pathToUse.startsWith("https://")) {
-          setFirstAudioUrl(`${pathToUse}${chapterPadded}${versePadded}.mp3`)
+          setFirstAudioUrl(`${pathToUse}${chapterPadded}${ayahPadded}.mp3`)
         } else {
-          setFirstAudioUrl(`${AUDIO_BASE_URL}${pathToUse}${chapterPadded}${versePadded}.mp3`)
+          setFirstAudioUrl(`${AUDIO_BASE_URL}${pathToUse}${chapterPadded}${ayahPadded}.mp3`)
         }
 
-        const verses = await api.getUthmaniVerses({ chapter_number: selectedNumber })
-        setUthmaniVerses(verses)
-        setCurrentVerseKey(`${selectedNumber}:1`)
+        const ayahs = await api.getUthmaniVerses({ chapter_number: selectedNumber })
+        setUthmaniAyahs(ayahs)
+        setCurrentAyahKey(`${selectedNumber}:1`)
       } else {
         // Use dedicated endpoints for juz, hizb, and rub
         let audioData
@@ -141,29 +141,29 @@ export default function Home() {
 
         if (audioData && audioData.audio_files.length > 0) {
           const firstUrl = normalizeUrl(audioData.audio_files[0].url)
-          setStartVerseKey(audioData.audio_files[0].verse_key)
+          setStartAyahKey(audioData.audio_files[0].verse_key)
           setFirstAudioUrl(firstUrl)
 
           const path = extractReciterPath(audioData.audio_files[0].url)
           setReciterPath(path)
 
-          setTotalVerses(audioData.pagination.total_records)
+          setTotalAyahs(audioData.pagination.total_records)
 
-          let verses: UthmaniVerse[] = []
+          let ayahs: UthmaniVerse[] = []
           switch (listeningMode) {
             case "juz":
-              verses = await api.getUthmaniVerses({ juz_number: selectedNumber })
+              ayahs = await api.getUthmaniVerses({ juz_number: selectedNumber })
               break
             case "hizb":
-              verses = await api.getUthmaniVerses({ hizb_number: selectedNumber })
+              ayahs = await api.getUthmaniVerses({ hizb_number: selectedNumber })
               break
             case "rub":
-              verses = await api.getUthmaniVerses({ rub_el_hizb_number: selectedNumber })
+              ayahs = await api.getUthmaniVerses({ rub_el_hizb_number: selectedNumber })
               break
           }
-          setUthmaniVerses(verses)
+          setUthmaniAyahs(ayahs)
           if (audioData && audioData.audio_files.length > 0) {
-            setCurrentVerseKey(audioData.audio_files[0].verse_key)
+            setCurrentAyahKey(audioData.audio_files[0].verse_key)
           }
         }
       }
@@ -203,9 +203,9 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-[clamp(1rem,2.5vw,1.5rem)] font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                QuranHifz
+                AyahPlayer
               </h1>
-              <p className="text-[clamp(0.625rem,1.2vw,0.875rem)] text-muted-foreground">Listen to the Holy Quran</p>
+              <p className="text-[clamp(0.625rem,1.2vw,0.875rem)] text-muted-foreground">Listen to the Holy Quran Ayah By Ayah</p>
             </div>
           </div>
         </div>
@@ -271,21 +271,21 @@ export default function Home() {
             <Card className="shadow-lg overflow-hidden flex flex-col">
               <CardHeader className="py-[clamp(0.5rem,1vh,0.75rem)] px-[clamp(0.75rem,1.5vw,1rem)] flex-none">
                 <CardTitle className="text-[clamp(0.875rem,2vw,1.25rem)]">Now Playing</CardTitle>
-                {startVerseKey && totalVerses > 0 && (
+                {startAyahKey && totalAyahs > 0 && (
                   <CardDescription className="text-[clamp(0.75rem,1.5vw,0.875rem)]">
                     {selectedReciterName} - {selectedStyle} • {getSelectionText()}
                   </CardDescription>
                 )}
               </CardHeader>
               <CardContent className="overflow-y-auto flex-1 p-[clamp(0.75rem,1.5vw,1rem)]">
-                {startVerseKey && totalVerses > 0 ? (
+                {startAyahKey && totalAyahs > 0 ? (
                   <AudioPlayer
-                    startVerseKey={startVerseKey}
-                    totalVerses={totalVerses}
+                    startAyahKey={startAyahKey}
+                    totalAyahs={totalAyahs}
                     baseUrl={AUDIO_BASE_URL}
                     firstAudioUrl={firstAudioUrl}
                     chapters={chapters}
-                    onVerseChange={setCurrentVerseKey}
+                    onAyahChange={setCurrentAyahKey}
                   />
                 ) : (
                   <div className="flex items-center justify-center text-center text-muted-foreground py-[clamp(1rem,2vh,2rem)]">
@@ -303,12 +303,12 @@ export default function Home() {
           {/* Uthmani Script Display - Full Width Below */}
           <Card className="shadow-lg flex-shrink-0 h-[clamp(8rem,25vh,16rem)]">
             <CardContent className="p-[clamp(0.75rem,1.5vw,1.5rem)] h-full overflow-y-auto flex items-center justify-center">
-              {startVerseKey && totalVerses > 0 && uthmaniVerses.length > 0 && currentVerseKey ? (
+              {startAyahKey && totalAyahs > 0 && uthmaniAyahs.length > 0 && currentAyahKey ? (
                 <div
                   className="text-[clamp(0.875rem,1.8vw,1.25rem)] leading-relaxed text-center font-arabic"
                   style={{ direction: "rtl", fontFamily: "'Amiri Quran', 'Traditional Arabic', serif" }}
                 >
-                  {uthmaniVerses.find((v) => v.verse_key === currentVerseKey)?.text_uthmani || ""}
+                  {uthmaniAyahs.find((v) => v.verse_key === currentAyahKey)?.text_uthmani || ""}
                 </div>
               ) : (
                 <div className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-muted-foreground text-center">

@@ -1,6 +1,6 @@
-# QuranHifz Backend API
+# AyahPlayer Backend API
 
-A TypeScript-based Express server for the QuranHifz application, built with MVC architecture.
+A TypeScript-based Express server for the AyahPlayer application, built with MVC architecture.
 
 ## Features
 
@@ -106,14 +106,14 @@ The Swagger UI provides:
   - Parameters: `rub_number` (1-240), `recitation_id`
 
 ### Verses
-- `GET /api/verses/uthmani` - Get Uthmani script of verses with optional filters (requires token)
+- `GET /api/verses/uthmani` - Get Uthmani script of ayahs with optional filters (requires token)
   - Query Parameters (all optional):
     - `chapter_number` (1-114): Filter by specific chapter/surah
     - `juz_number` (1-30): Filter by specific juz
     - `page_number` (1-604): Filter by Madani Mushaf page number
     - `hizb_number` (1-60): Filter by specific hizb
     - `rub_el_hizb_number` (1-240): Filter by specific Rub el Hizb
-    - `verse_key` (e.g., "1:1"): Filter by specific verse
+    - `verse_key` (e.g., "1:1"): Filter by specific ayah
   - Leave all parameters blank to fetch the entire Quran
 
 ## Authentication
@@ -138,15 +138,15 @@ curl -X GET http://localhost:5000/api/chapters \
 curl -X GET "http://localhost:5000/api/reciters?language=ar" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-# 4. Get Uthmani script verses by chapter
+# 4. Get Uthmani script ayahs by chapter
 curl -X GET "http://localhost:5000/api/verses/uthmani?chapter_number=1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-# 5. Get Uthmani script verses by page
+# 5. Get Uthmani script ayahs by page
 curl -X GET "http://localhost:5000/api/verses/uthmani?page_number=1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-# 6. Get Uthmani script of specific verse
+# 6. Get Uthmani script of specific ayah
 curl -X GET "http://localhost:5000/api/verses/uthmani?verse_key=1:1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
@@ -190,32 +190,32 @@ const recitersResponse = await fetch('http://localhost:5000/api/reciters?languag
 });
 const reciters = await recitersResponse.json();
 
-// 4. Get Uthmani script verses by chapter
-const versesByChapterResponse = await fetch('http://localhost:5000/api/verses/uthmani?chapter_number=1', {
+// 4. Get Uthmani script ayahs by chapter
+const ayahsByChapterResponse = await fetch('http://localhost:5000/api/verses/uthmani?chapter_number=1', {
   method: 'GET',
   headers: {
     'Authorization': `Bearer ${access_token}`
   }
 });
-const versesByChapter = await versesByChapterResponse.json();
+const ayahsByChapter = await ayahsByChapterResponse.json();
 
-// 5. Get Uthmani script verses by page
-const versesByPageResponse = await fetch('http://localhost:5000/api/verses/uthmani?page_number=1', {
+// 5. Get Uthmani script ayahs by page
+const ayahsByPageResponse = await fetch('http://localhost:5000/api/verses/uthmani?page_number=1', {
   method: 'GET',
   headers: {
     'Authorization': `Bearer ${access_token}`
   }
 });
-const versesByPage = await versesByPageResponse.json();
+const ayahsByPage = await ayahsByPageResponse.json();
 
-// 6. Get Uthmani script of specific verse
-const specificVerseResponse = await fetch('http://localhost:5000/api/verses/uthmani?verse_key=1:1', {
+// 6. Get Uthmani script of specific ayah
+const specificAyahResponse = await fetch('http://localhost:5000/api/verses/uthmani?verse_key=1:1', {
   method: 'GET',
   headers: {
     'Authorization': `Bearer ${access_token}`
   }
 });
-const specificVerse = await specificVerseResponse.json();
+const specificAyah = await specificAyahResponse.json();
 
 // 7. Get audio files by juz and recitation
 const juzAudioResponse = await fetch('http://localhost:5000/api/reciters/recitations/7/by_juz/1', {

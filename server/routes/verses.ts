@@ -10,8 +10,8 @@ const router = express.Router();
  *   get:
  *     tags:
  *       - Verses
- *     summary: Get Uthmani script of verses
- *     description: Retrieve Uthmani script of Quran verses with optional filtering. Leave all query parameters blank to fetch the entire Quran.
+ *     summary: Get Uthmani script of ayahs
+ *     description: Retrieve Uthmani script of Quran ayahs with optional filtering. Leave all query parameters blank to fetch the entire Quran.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -60,10 +60,10 @@ const router = express.Router();
  *         required: false
  *         schema:
  *           type: string
- *         description: Filter by specific verse (e.g., "1:1" for Al-Fatihah, verse 1)
+ *         description: Filter by specific ayah (e.g., "1:1" for Al-Fatihah, ayah 1)
  *     responses:
  *       200:
- *         description: Successfully retrieved Uthmani script verses
+ *         description: Successfully retrieved Uthmani script ayahs
  *         content:
  *           application/json:
  *             schema:

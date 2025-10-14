@@ -5,7 +5,7 @@ import { VersesResponse } from "../types/responses";
 
 const { CLIENT_ID, BASE_URL } = process.env;
 
-// @desc    Get Uthmani script of verses with optional filters
+// @desc    Get Uthmani script of ayahs with optional filters
 // @route   GET /api/verses/uthmani
 // @access  Private (requires access token)
 export const getUthmaniVerses = async (

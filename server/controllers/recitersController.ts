@@ -38,7 +38,7 @@ export const getAllReciters = async (
   }
 };
 
-// @desc    Get verses by rub and recitation
+// @desc    Get audio files for ayahs by rub and recitation
 // @route   GET /api/reciters/rub/:rub_number/recitation/:recitation_id
 // @access  Private (requires access token)
 export const getVersesByRubAndRecitation = async (

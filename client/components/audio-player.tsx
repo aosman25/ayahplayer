@@ -7,23 +7,23 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Loader2, Repeat }
 import type { Chapter } from "@/lib/api-client"
 
 interface AudioPlayerProps {
-  startVerseKey: string
-  totalVerses: number
+  startAyahKey: string
+  totalAyahs: number
   baseUrl: string
   firstAudioUrl: string
   chapters: Chapter[]
-  onVerseChange?: (verseKey: string) => void
+  onAyahChange?: (ayahKey: string) => void
 }
 
 export function AudioPlayer({
-  startVerseKey,
-  totalVerses,
+  startAyahKey,
+  totalAyahs,
   baseUrl,
   firstAudioUrl,
   chapters,
-  onVerseChange,
+  onAyahChange,
 }: AudioPlayerProps) {
-  const [startChapter, startVerse] = startVerseKey.split(":").map(Number)
+  const [startChapter, startAyah] = startAyahKey.split(":").map(Number)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -61,41 +61,41 @@ export function AudioPlayer({
     }
   }, [firstAudioUrl, baseUrl])
 
-  const currentVerseInfo = useMemo(() => {
+  const currentAyahInfo = useMemo(() => {
     let currentChapter = startChapter
-    let currentVerse = startVerse + currentIndex
+    let currentAyah = startAyah + currentIndex
 
-    // Navigate through chapters if we exceed verse count
+    // Navigate through chapters if we exceed ayah count
     while (currentChapter <= 114 && chapters[currentChapter - 1]) {
-      const chapterVerseCount = chapters[currentChapter - 1].verses_count
-      if (currentVerse <= chapterVerseCount) {
+      const chapterAyahCount = chapters[currentChapter - 1].verses_count
+      if (currentAyah <= chapterAyahCount) {
         break
       }
-      currentVerse -= chapterVerseCount
+      currentAyah -= chapterAyahCount
       currentChapter++
     }
 
     const chapterStr = currentChapter.toString().padStart(3, "0")
-    const verseStr = currentVerse.toString().padStart(3, "0")
-    const audioUrl = `${actualBaseUrl}${relativePath}${chapterStr}${verseStr}.mp3`
-    const verseKey = `${currentChapter}:${currentVerse}`
+    const ayahStr = currentAyah.toString().padStart(3, "0")
+    const audioUrl = `${actualBaseUrl}${relativePath}${chapterStr}${ayahStr}.mp3`
+    const ayahKey = `${currentChapter}:${currentAyah}`
 
-    return { chapter: currentChapter, verse: currentVerse, audioUrl, verseKey }
-  }, [currentIndex, startChapter, startVerse, chapters, actualBaseUrl, relativePath])
+    return { chapter: currentChapter, ayah: currentAyah, audioUrl, ayahKey }
+  }, [currentIndex, startChapter, startAyah, chapters, actualBaseUrl, relativePath])
 
-  // Notify parent component when verse changes
+  // Notify parent component when ayah changes
   useEffect(() => {
-    if (onVerseChange && currentVerseInfo.verseKey) {
-      onVerseChange(currentVerseInfo.verseKey)
+    if (onAyahChange && currentAyahInfo.ayahKey) {
+      onAyahChange(currentAyahInfo.ayahKey)
     }
-  }, [currentVerseInfo.verseKey, onVerseChange])
+  }, [currentAyahInfo.ayahKey, onAyahChange])
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
 
     setIsLoading(true)
-    audio.src = currentVerseInfo.audioUrl
+    audio.src = currentAyahInfo.audioUrl
     audio.load()
 
     if (isPlaying) {
@@ -107,7 +107,7 @@ export function AudioPlayer({
         })
       }
     }
-  }, [currentIndex, currentVerseInfo.audioUrl])
+  }, [currentIndex, currentAyahInfo.audioUrl])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -120,7 +120,7 @@ export function AudioPlayer({
       setIsLoading(false)
     }
     const handleEnded = () => {
-      if (currentIndex < totalVerses - 1) {
+      if (currentIndex < totalAyahs - 1) {
         setCurrentIndex((prev) => prev + 1)
         setIsPlaying(true)
       } else if (autoReplay) {
@@ -144,7 +144,7 @@ export function AudioPlayer({
       audio.removeEventListener("loadstart", handleLoadStart)
       audio.removeEventListener("canplay", handleCanPlay)
     }
-  }, [currentIndex, totalVerses, autoReplay])
+  }, [currentIndex, totalAyahs, autoReplay])
 
   useEffect(() => {
     if (audioRef.current) {
@@ -173,7 +173,7 @@ export function AudioPlayer({
   }
 
   const handleNext = () => {
-    if (currentIndex < totalVerses - 1) {
+    if (currentIndex < totalAyahs - 1) {
       setCurrentIndex(currentIndex + 1)
       setIsPlaying(true)
     }
@@ -217,14 +217,14 @@ export function AudioPlayer({
 
   const getChapterName = () => {
     if (chapters.length === 0) return ""
-    const chapterIndex = currentVerseInfo.chapter - 1
+    const chapterIndex = currentAyahInfo.chapter - 1
     if (chapterIndex >= 0 && chapterIndex < chapters.length) {
       return chapters[chapterIndex].name_simple
     }
     return ""
   }
 
-  if (!startVerseKey || totalVerses === 0) {
+  if (!startAyahKey || totalAyahs === 0) {
     return (
       <div className="text-center text-muted-foreground py-12">
         <p className="text-lg">Select a reciter and segment to start listening</p>
@@ -236,13 +236,13 @@ export function AudioPlayer({
     <div className="h-full flex flex-col justify-evenly">
       <audio ref={audioRef} preload="auto" />
 
-      {/* Current verse info */}
+      {/* Current ayah info */}
       <div className="text-center space-y-[clamp(0.125rem,0.25vh,0.25rem)]">
         <div className="text-[clamp(0.65rem,1.2vw,0.75rem)] font-medium text-muted-foreground uppercase tracking-wide">Now Playing</div>
         {getChapterName() && <div className="text-[clamp(0.75rem,1.5vw,1rem)] font-bold text-primary">{getChapterName()}</div>}
-        <div className="text-[clamp(0.875rem,1.8vw,1.125rem)] font-semibold">Verse {currentVerseInfo.verseKey}</div>
+        <div className="text-[clamp(0.875rem,1.8vw,1.125rem)] font-semibold">Ayah {currentAyahInfo.ayahKey}</div>
         <div className="text-[clamp(0.65rem,1.2vw,0.75rem)] text-muted-foreground">
-          Verse {currentIndex + 1} of {totalVerses}
+          Ayah {currentIndex + 1} of {totalAyahs}
         </div>
       </div>
 
@@ -289,7 +289,7 @@ export function AudioPlayer({
           size="icon"
           className="h-[clamp(2rem,3.5vw,2.5rem)] w-[clamp(2rem,3.5vw,2.5rem)] bg-transparent"
           onClick={handleNext}
-          disabled={currentIndex === totalVerses - 1 || isLoading}
+          disabled={currentIndex === totalAyahs - 1 || isLoading}
         >
           <SkipForward className="h-[clamp(0.875rem,1.5vw,1rem)] w-[clamp(0.875rem,1.5vw,1rem)]" />
         </Button>

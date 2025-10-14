@@ -7,8 +7,8 @@ import "./globals.css"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "QuranHifz - Listen to the Holy Quran",
-  description: "Listen to Quran recitations by rub number with your favorite reciters",
+  title: "AyahPlayer - Listen to the Holy Quran Ayah By Ayah",
+  description: "Listen to the Holy Quran Ayah By Ayah with your favorite reciters",
   generator: "v0.app",
 }
 

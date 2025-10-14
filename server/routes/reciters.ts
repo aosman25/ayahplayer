@@ -50,8 +50,8 @@ router.get("/", requireAccessToken, getAllReciters);
  *   get:
  *     tags:
  *       - Reciters
- *     summary: Get audio files for verses by juz and recitation
- *     description: Retrieve audio file URLs for verses in a specific juz with a specific recitation
+ *     summary: Get audio files for ayahs by juz and recitation
+ *     description: Retrieve audio file URLs for ayahs in a specific juz with a specific recitation
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -103,8 +103,8 @@ router.get("/recitations/:recitation_id/by_juz/:juz_number", requireAccessToken,
  *   get:
  *     tags:
  *       - Reciters
- *     summary: Get audio files for verses by hizb and recitation
- *     description: Retrieve audio file URLs for verses in a specific hizb with a specific recitation
+ *     summary: Get audio files for ayahs by hizb and recitation
+ *     description: Retrieve audio file URLs for ayahs in a specific hizb with a specific recitation
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -156,8 +156,8 @@ router.get("/recitations/:recitation_id/by_hizb/:hizb_number", requireAccessToke
  *   get:
  *     tags:
  *       - Reciters
- *     summary: Get audio files for verses by rub and recitation
- *     description: Retrieve audio file URLs for verses in a specific rub with a specific recitation
+ *     summary: Get audio files for ayahs by rub and recitation
+ *     description: Retrieve audio file URLs for ayahs in a specific rub with a specific recitation
  *     security:
  *       - bearerAuth: []
  *     parameters:
