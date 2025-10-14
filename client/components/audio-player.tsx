@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Loader2, Repeat } from "lucide-react"
 import type { Chapter } from "@/lib/api-client"
-import type { UthmaniVerse } from "@/lib/api-client"
 
 interface AudioPlayerProps {
   startVerseKey: string
@@ -13,7 +12,7 @@ interface AudioPlayerProps {
   baseUrl: string
   firstAudioUrl: string
   chapters: Chapter[]
-  uthmaniVerses: UthmaniVerse[]
+  onVerseChange?: (verseKey: string) => void
 }
 
 export function AudioPlayer({
@@ -22,7 +21,7 @@ export function AudioPlayer({
   baseUrl,
   firstAudioUrl,
   chapters,
-  uthmaniVerses,
+  onVerseChange,
 }: AudioPlayerProps) {
   const [startChapter, startVerse] = startVerseKey.split(":").map(Number)
 
@@ -83,6 +82,13 @@ export function AudioPlayer({
 
     return { chapter: currentChapter, verse: currentVerse, audioUrl, verseKey }
   }, [currentIndex, startChapter, startVerse, chapters, actualBaseUrl, relativePath])
+
+  // Notify parent component when verse changes
+  useEffect(() => {
+    if (onVerseChange && currentVerseInfo.verseKey) {
+      onVerseChange(currentVerseInfo.verseKey)
+    }
+  }, [currentVerseInfo.verseKey, onVerseChange])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -218,11 +224,6 @@ export function AudioPlayer({
     return ""
   }
 
-  const getCurrentUthmaniText = () => {
-    const verse = uthmaniVerses.find((v) => v.verse_key === currentVerseInfo.verseKey)
-    return verse?.text_uthmani || ""
-  }
-
   if (!startVerseKey || totalVerses === 0) {
     return (
       <div className="text-center text-muted-foreground py-12">
@@ -231,36 +232,22 @@ export function AudioPlayer({
     )
   }
 
-  const uthmaniText = getCurrentUthmaniText()
-
   return (
-    <div className="space-y-8">
+    <div className="h-full flex flex-col justify-evenly">
       <audio ref={audioRef} preload="auto" />
 
-      {/* Uthmani text display */}
-      {uthmaniText && (
-        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-8 md:p-10 border-2 border-primary/20 shadow-inner">
-          <div
-            className="text-3xl md:text-4xl lg:text-5xl leading-loose text-center font-arabic"
-            style={{ direction: "rtl", fontFamily: "'Amiri Quran', 'Traditional Arabic', serif" }}
-          >
-            {uthmaniText}
-          </div>
-        </div>
-      )}
-
       {/* Current verse info */}
-      <div className="text-center space-y-3 py-4">
-        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Now Playing</div>
-        {getChapterName() && <div className="text-xl font-bold text-primary">{getChapterName()}</div>}
-        <div className="text-2xl font-semibold">Verse {currentVerseInfo.verseKey}</div>
-        <div className="text-sm text-muted-foreground">
+      <div className="text-center space-y-[clamp(0.125rem,0.25vh,0.25rem)]">
+        <div className="text-[clamp(0.65rem,1.2vw,0.75rem)] font-medium text-muted-foreground uppercase tracking-wide">Now Playing</div>
+        {getChapterName() && <div className="text-[clamp(0.75rem,1.5vw,1rem)] font-bold text-primary">{getChapterName()}</div>}
+        <div className="text-[clamp(0.875rem,1.8vw,1.125rem)] font-semibold">Verse {currentVerseInfo.verseKey}</div>
+        <div className="text-[clamp(0.65rem,1.2vw,0.75rem)] text-muted-foreground">
           Verse {currentIndex + 1} of {totalVerses}
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="space-y-3">
+      <div className="space-y-[clamp(0.125rem,0.25vh,0.25rem)]">
         <Slider
           value={[currentTime]}
           max={duration || 100}
@@ -269,49 +256,49 @@ export function AudioPlayer({
           className="w-full"
           disabled={isLoading}
         />
-        <div className="flex justify-between text-sm font-medium text-muted-foreground">
+        <div className="flex justify-between text-[clamp(0.65rem,1.2vw,0.75rem)] font-medium text-muted-foreground">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-[clamp(0.375rem,0.75vw,0.75rem)]">
         <Button
           variant="outline"
           size="icon"
-          className="h-12 w-12 bg-transparent"
+          className="h-[clamp(2rem,3.5vw,2.5rem)] w-[clamp(2rem,3.5vw,2.5rem)] bg-transparent"
           onClick={handlePrevious}
           disabled={currentIndex === 0 || isLoading}
         >
-          <SkipBack className="h-5 w-5" />
+          <SkipBack className="h-[clamp(0.875rem,1.5vw,1rem)] w-[clamp(0.875rem,1.5vw,1rem)]" />
         </Button>
 
-        <Button size="icon" className="h-16 w-16 shadow-lg" onClick={togglePlayPause} disabled={isLoading}>
+        <Button size="icon" className="h-[clamp(2.5rem,4.5vw,3.25rem)] w-[clamp(2.5rem,4.5vw,3.25rem)] shadow-lg" onClick={togglePlayPause} disabled={isLoading}>
           {isLoading ? (
-            <Loader2 className="h-6 w-6 animate-spin" />
+            <Loader2 className="h-[clamp(1rem,1.8vw,1.25rem)] w-[clamp(1rem,1.8vw,1.25rem)] animate-spin" />
           ) : isPlaying ? (
-            <Pause className="h-6 w-6" />
+            <Pause className="h-[clamp(1rem,1.8vw,1.25rem)] w-[clamp(1rem,1.8vw,1.25rem)]" />
           ) : (
-            <Play className="h-6 w-6 ml-1" />
+            <Play className="h-[clamp(1rem,1.8vw,1.25rem)] w-[clamp(1rem,1.8vw,1.25rem)] ml-[clamp(0.1rem,0.2vw,0.2rem)]" />
           )}
         </Button>
 
         <Button
           variant="outline"
           size="icon"
-          className="h-12 w-12 bg-transparent"
+          className="h-[clamp(2rem,3.5vw,2.5rem)] w-[clamp(2rem,3.5vw,2.5rem)] bg-transparent"
           onClick={handleNext}
           disabled={currentIndex === totalVerses - 1 || isLoading}
         >
-          <SkipForward className="h-5 w-5" />
+          <SkipForward className="h-[clamp(0.875rem,1.5vw,1rem)] w-[clamp(0.875rem,1.5vw,1rem)]" />
         </Button>
       </div>
 
       {/* Volume control with autoreplay button */}
-      <div className="flex items-center gap-4 px-2">
-        <Button variant="ghost" size="icon" onClick={toggleMute} className="shrink-0">
-          {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+      <div className="flex items-center gap-[clamp(0.375rem,0.75vw,0.75rem)] px-[clamp(0.125rem,0.25vw,0.25rem)]">
+        <Button variant="ghost" size="icon" className="shrink-0 h-[clamp(1.75rem,3vw,2.25rem)] w-[clamp(1.75rem,3vw,2.25rem)]" onClick={toggleMute}>
+          {isMuted || volume === 0 ? <VolumeX className="h-[clamp(0.875rem,1.5vw,1rem)] w-[clamp(0.875rem,1.5vw,1rem)]" /> : <Volume2 className="h-[clamp(0.875rem,1.5vw,1rem)] w-[clamp(0.875rem,1.5vw,1rem)]" />}
         </Button>
         <Slider
           value={[isMuted ? 0 : volume]}
@@ -325,9 +312,9 @@ export function AudioPlayer({
           size="icon"
           onClick={toggleAutoReplay}
           title={autoReplay ? "Autoreplay enabled" : "Autoreplay disabled"}
-          className="shrink-0"
+          className="shrink-0 h-[clamp(1.75rem,3vw,2.25rem)] w-[clamp(1.75rem,3vw,2.25rem)]"
         >
-          <Repeat className="h-5 w-5" />
+          <Repeat className="h-[clamp(0.875rem,1.5vw,1rem)] w-[clamp(0.875rem,1.5vw,1rem)]" />
         </Button>
       </div>
     </div>

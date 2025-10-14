@@ -23,6 +23,7 @@ export default function Home() {
   const [firstAudioUrl, setFirstAudioUrl] = useState<string>("")
   const [reciterPath, setReciterPath] = useState<string>("")
   const [uthmaniVerses, setUthmaniVerses] = useState<UthmaniVerse[]>([])
+  const [currentVerseKey, setCurrentVerseKey] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -121,6 +122,7 @@ export default function Home() {
 
         const verses = await api.getUthmaniVerses({ chapter_number: selectedNumber })
         setUthmaniVerses(verses)
+        setCurrentVerseKey(`${selectedNumber}:1`)
       } else {
         // Use dedicated endpoints for juz, hizb, and rub
         let audioData
@@ -160,6 +162,9 @@ export default function Home() {
               break
           }
           setUthmaniVerses(verses)
+          if (audioData && audioData.audio_files.length > 0) {
+            setCurrentVerseKey(audioData.audio_files[0].verse_key)
+          }
         }
       }
     } catch (err) {
@@ -188,104 +193,130 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <div className="container max-w-5xl mx-auto px-4 py-8 md:py-12">
-        {/* Header */}
-        <div className="text-center mb-10 md:mb-14 space-y-4">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-primary/10 rounded-xl">
-              <BookOpen className="h-8 w-8 text-primary" />
+    <div className="h-screen flex flex-col bg-gradient-to-b from-background to-muted/20 p-4 px-8 md:p-4 md:px-12 lg:p-4 lg:px-16">
+      {/* Header */}
+      <div className="flex-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-t-lg">
+        <div className="px-4 py-2">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-primary/10 rounded-lg">
+              <BookOpen className="h-[clamp(1rem,2vw,1.25rem)] w-[clamp(1rem,2vw,1.25rem)] text-primary" />
+            </div>
+            <div>
+              <h1 className="text-[clamp(1rem,2.5vw,1.5rem)] font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                QuranHifz
+              </h1>
+              <p className="text-[clamp(0.625rem,1.2vw,0.875rem)] text-muted-foreground">Listen to the Holy Quran</p>
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            QuranHifz
-          </h1>
-          <p className="text-muted-foreground text-pretty max-w-2xl mx-auto text-base md:text-lg">
-            Listen to the Holy Quran with your preferred reciter. Choose by Chapter, Juz, Hizb, or Rub.
-          </p>
         </div>
+      </div>
 
-        {/* Main content */}
-        <div className="space-y-6">
-          {/* Selection card */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl">Select Recitation</CardTitle>
-              <CardDescription className="text-base">
-                Choose your reciter, listening mode, and segment to begin
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <ReciterSelector onReciterChange={handleReciterChange} selectedReciterId={selectedReciterId} />
+      {/* Main content */}
+      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+        <div className="h-full flex flex-col gap-[clamp(0.5rem,1.5vh,1rem)]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[clamp(0.5rem,1.5vh,1rem)] flex-1 min-h-0">
+            {/* Selection Panel */}
+            <Card className="shadow-lg overflow-hidden flex flex-col">
+              <CardHeader className="py-[clamp(0.375rem,0.75vh,0.5rem)] px-[clamp(0.5rem,1vw,0.75rem)] flex-none">
+                <CardTitle className="text-[clamp(0.75rem,1.5vw,1rem)]">Select Recitation</CardTitle>
+                <CardDescription className="text-[clamp(0.65rem,1.2vw,0.75rem)]">
+                  Choose your reciter, listening mode, and segment to begin
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="overflow-y-auto flex-1 p-[clamp(0.5rem,1vw,0.75rem)] flex flex-col">
+                <div className="flex-1 flex flex-col justify-evenly gap-[clamp(0.125rem,0.25vh,0.25rem)]">
+                  <ReciterSelector onReciterChange={handleReciterChange} selectedReciterId={selectedReciterId} />
 
-              <RubSelector
-                onRubChange={handleNumberChange}
-                selectedRub={selectedNumber}
-                mode={listeningMode}
-                onModeChange={handleModeChange}
-                chapters={chapters}
-              />
+                  <RubSelector
+                    onRubChange={handleNumberChange}
+                    selectedRub={selectedNumber}
+                    mode={listeningMode}
+                    onModeChange={handleModeChange}
+                    chapters={chapters}
+                  />
 
-              {selectedReciterName && selectedStyle && (
-                <div className="text-sm p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-primary">Selected:</span>
-                    <span className="text-foreground">
-                      {selectedReciterName} - {selectedStyle}
-                      {selectedNumber && ` • ${getSelectionText()}`}
-                    </span>
-                  </div>
+                  {selectedReciterName && selectedStyle && (
+                    <div className="text-[clamp(0.65rem,1.2vw,0.75rem)] p-[clamp(0.375rem,0.75vh,0.5rem)] bg-primary/5 border border-primary/20 rounded-lg">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-primary">Selected:</span>
+                        <span className="text-foreground">
+                          {selectedReciterName} - {selectedStyle}
+                          {selectedNumber && ` • ${getSelectionText()}`}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <Button onClick={handleLoadAudio} disabled={!canLoadAudio || loading} className="w-full h-[clamp(1.75rem,3.5vh,2.25rem)] text-[clamp(0.75rem,1.5vw,0.875rem)]">
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-1.5 h-[clamp(0.875rem,1.5vw,1rem)] w-[clamp(0.875rem,1.5vw,1rem)] animate-spin" />
+                        Loading Audio...
+                      </>
+                    ) : (
+                      "Load Audio"
+                    )}
+                  </Button>
+
+                  {error && (
+                    <div className="text-[clamp(0.65rem,1.2vw,0.75rem)] text-destructive p-[clamp(0.375rem,0.75vh,0.5rem)] border border-destructive/50 rounded-lg bg-destructive/5">
+                      {error}
+                    </div>
+                  )}
                 </div>
-              )}
+              </CardContent>
+            </Card>
 
-              <Button onClick={handleLoadAudio} disabled={!canLoadAudio || loading} className="w-full" size="lg">
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Loading Audio...
-                  </>
-                ) : (
-                  "Load Audio"
+            {/* Player Panel */}
+            <Card className="shadow-lg overflow-hidden flex flex-col">
+              <CardHeader className="py-[clamp(0.5rem,1vh,0.75rem)] px-[clamp(0.75rem,1.5vw,1rem)] flex-none">
+                <CardTitle className="text-[clamp(0.875rem,2vw,1.25rem)]">Now Playing</CardTitle>
+                {startVerseKey && totalVerses > 0 && (
+                  <CardDescription className="text-[clamp(0.75rem,1.5vw,0.875rem)]">
+                    {selectedReciterName} - {selectedStyle} • {getSelectionText()}
+                  </CardDescription>
                 )}
-              </Button>
+              </CardHeader>
+              <CardContent className="overflow-y-auto flex-1 p-[clamp(0.75rem,1.5vw,1rem)]">
+                {startVerseKey && totalVerses > 0 ? (
+                  <AudioPlayer
+                    startVerseKey={startVerseKey}
+                    totalVerses={totalVerses}
+                    baseUrl={AUDIO_BASE_URL}
+                    firstAudioUrl={firstAudioUrl}
+                    chapters={chapters}
+                    onVerseChange={setCurrentVerseKey}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center text-center text-muted-foreground py-[clamp(1rem,2vh,2rem)]">
+                    <div>
+                      <BookOpen className="h-[clamp(2rem,4vw,3rem)] w-[clamp(2rem,4vw,3rem)] mx-auto mb-[clamp(0.5rem,1vh,0.75rem)] opacity-20" />
+                      <p className="text-[clamp(0.875rem,2vw,1.125rem)]">Select a recitation to start</p>
+                      <p className="text-[clamp(0.75rem,1.5vw,0.875rem)] mt-2">Choose your reciter and segment from the left panel</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
-              {error && (
-                <div className="text-sm text-destructive p-4 border border-destructive/50 rounded-lg bg-destructive/5">
-                  {error}
+          {/* Uthmani Script Display - Full Width Below */}
+          <Card className="shadow-lg flex-shrink-0 h-[clamp(8rem,25vh,16rem)]">
+            <CardContent className="p-[clamp(0.75rem,1.5vw,1.5rem)] h-full overflow-y-auto flex items-center justify-center">
+              {startVerseKey && totalVerses > 0 && uthmaniVerses.length > 0 && currentVerseKey ? (
+                <div
+                  className="text-[clamp(0.875rem,1.8vw,1.25rem)] leading-relaxed text-center font-arabic"
+                  style={{ direction: "rtl", fontFamily: "'Amiri Quran', 'Traditional Arabic', serif" }}
+                >
+                  {uthmaniVerses.find((v) => v.verse_key === currentVerseKey)?.text_uthmani || ""}
+                </div>
+              ) : (
+                <div className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-muted-foreground text-center">
+                  Ayahs will appear here when audio is playing
                 </div>
               )}
             </CardContent>
           </Card>
-
-          {/* Player card */}
-          {startVerseKey && totalVerses > 0 && (
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-2xl">Now Playing</CardTitle>
-                <CardDescription className="text-base">
-                  {selectedReciterName} - {selectedStyle} • {getSelectionText()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AudioPlayer
-                  startVerseKey={startVerseKey}
-                  totalVerses={totalVerses}
-                  baseUrl={AUDIO_BASE_URL}
-                  firstAudioUrl={firstAudioUrl}
-                  chapters={chapters}
-                  uthmaniVerses={uthmaniVerses}
-                />
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="mt-16 text-center text-sm text-muted-foreground space-y-2">
-          <p className="font-arabic text-lg" style={{ direction: "rtl" }}>
-            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-          </p>
-          <p>May Allah accept your efforts in listening to His words</p>
         </div>
       </div>
     </div>
