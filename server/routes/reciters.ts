@@ -152,7 +152,7 @@ router.get("/recitations/:recitation_id/by_hizb/:hizb_number", requireAccessToke
 
 /**
  * @openapi
- * /api/reciters/rub/{rub_number}/recitation/{recitation_id}:
+ * /api/reciters/recitations/{recitation_id}/by_rub/{rub_number}:
  *   get:
  *     tags:
  *       - Reciters
@@ -201,6 +201,6 @@ router.get("/recitations/:recitation_id/by_hizb/:hizb_number", requireAccessToke
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get("/rub/:rub_number/recitation/:recitation_id", requireAccessToken, getVersesByRubAndRecitation);
+router.get("/recitations/:recitation_id/by_rub/:rub_number", requireAccessToken, getVersesByRubAndRecitation);
 
 export default router;

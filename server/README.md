@@ -102,7 +102,8 @@ The Swagger UI provides:
   - Parameters: `juz_number` (1-30), `recitation_id`
 - `GET /api/reciters/recitations/:recitation_id/by_hizb/:hizb_number` - Get audio files for verses by hizb and recitation (requires token)
   - Parameters: `hizb_number` (1-60), `recitation_id`
-- `GET /api/reciters/rub/:rub_number/recitation/:recitation_id` - Get audio files for verses by rub and recitation (requires token)
+- `GET /api/reciters/recitations/:recitation_id/by_rub/:rub_number` - Get audio files for verses by rub and recitation (requires token)
+  - Parameters: `rub_number` (1-240), `recitation_id`
 
 ### Verses
 - `GET /api/verses/rub/:rub_number` - Get verses by rub number (requires token)
@@ -142,7 +143,7 @@ curl -X GET http://localhost:5000/api/reciters/recitations/7/by_hizb/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
 # 7. Get audio files by rub and recitation
-curl -X GET http://localhost:5000/api/reciters/rub/1/recitation/7 \
+curl -X GET http://localhost:5000/api/reciters/recitations/7/by_rub/1 \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -201,13 +202,13 @@ const hizbAudioResponse = await fetch('http://localhost:5000/api/reciters/recita
 const hizbAudioFiles = await hizbAudioResponse.json();
 
 // 7. Get audio files by rub and recitation
-const audioResponse = await fetch('http://localhost:5000/api/reciters/rub/1/recitation/7', {
+const rubAudioResponse = await fetch('http://localhost:5000/api/reciters/recitations/7/by_rub/1', {
   method: 'GET',
   headers: {
     'Authorization': `Bearer ${access_token}`
   }
 });
-const audioFiles = await audioResponse.json();
+const rubAudioFiles = await rubAudioResponse.json();
 ```
 
 ## Type Safety
