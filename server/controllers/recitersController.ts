@@ -39,7 +39,7 @@ export const getAllReciters = async (
 };
 
 // @desc    Get verses by rub and recitation
-// @route   GET /api/rub/:rub_number/recitation/:recitation_id
+// @route   GET /api/reciters/rub/:rub_number/recitation/:recitation_id
 // @access  Private (requires access token)
 export const getVersesByRubAndRecitation = async (
   req: AuthRequest,
@@ -60,6 +60,86 @@ export const getVersesByRubAndRecitation = async (
     const response = await axios<AudioFilesResponse>({
       method: "get",
       url: `${BASE_URL}/content/api/v4/recitations/${recitationId}/by_rub/${rubNumber}`,
+      headers: {
+        Accept: "application/json",
+        "x-auth-token": req.accessToken,
+        "x-client-id": CLIENT_ID,
+      },
+    });
+    res.status(200).json(response.data);
+  } catch (error) {
+    const statusCode = axios.isAxiosError(error)
+      ? error.response?.status || 500
+      : 500;
+    const errorMessage = axios.isAxiosError(error)
+      ? error.message
+      : (error as Error).message;
+    res.status(statusCode).json({ error: errorMessage });
+  }
+};
+
+// @desc    Get audio files by juz and recitation
+// @route   GET /api/reciters/recitations/:recitation_id/by_juz/:juz_number
+// @access  Private (requires access token)
+export const getVersesByJuzAndRecitation = async (
+  req: AuthRequest,
+  res: Response<AudioFilesResponse | ErrorResponse>
+): Promise<void | Response<ErrorResponse>> => {
+  try {
+    const juzNumber = Number(req.params.juz_number);
+    const recitationId = Number(req.params.recitation_id);
+
+    if (isNaN(juzNumber) || isNaN(recitationId)) {
+      return res
+        .status(400)
+        .json({ error: "Juz Number and Recitation ID must be numbers" });
+    } else if (juzNumber < 1 || juzNumber > 30) {
+      return res.status(400).json({ error: "Juz Number must be between 1 and 30" });
+    }
+
+    const response = await axios<AudioFilesResponse>({
+      method: "get",
+      url: `${BASE_URL}/content/api/v4/recitations/${recitationId}/by_juz/${juzNumber}`,
+      headers: {
+        Accept: "application/json",
+        "x-auth-token": req.accessToken,
+        "x-client-id": CLIENT_ID,
+      },
+    });
+    res.status(200).json(response.data);
+  } catch (error) {
+    const statusCode = axios.isAxiosError(error)
+      ? error.response?.status || 500
+      : 500;
+    const errorMessage = axios.isAxiosError(error)
+      ? error.message
+      : (error as Error).message;
+    res.status(statusCode).json({ error: errorMessage });
+  }
+};
+
+// @desc    Get audio files by hizb and recitation
+// @route   GET /api/reciters/recitations/:recitation_id/by_hizb/:hizb_number
+// @access  Private (requires access token)
+export const getVersesByHizbAndRecitation = async (
+  req: AuthRequest,
+  res: Response<AudioFilesResponse | ErrorResponse>
+): Promise<void | Response<ErrorResponse>> => {
+  try {
+    const hizbNumber = Number(req.params.hizb_number);
+    const recitationId = Number(req.params.recitation_id);
+
+    if (isNaN(hizbNumber) || isNaN(recitationId)) {
+      return res
+        .status(400)
+        .json({ error: "Hizb Number and Recitation ID must be numbers" });
+    } else if (hizbNumber < 1 || hizbNumber > 60) {
+      return res.status(400).json({ error: "Hizb Number must be between 1 and 60" });
+    }
+
+    const response = await axios<AudioFilesResponse>({
+      method: "get",
+      url: `${BASE_URL}/content/api/v4/recitations/${recitationId}/by_hizb/${hizbNumber}`,
       headers: {
         Accept: "application/json",
         "x-auth-token": req.accessToken,
