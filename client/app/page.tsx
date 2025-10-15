@@ -212,19 +212,19 @@ export default function Home() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        <div className="h-full flex flex-col gap-[clamp(0.5rem,1.5vh,1rem)]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[clamp(0.5rem,1.5vh,1rem)] flex-1 min-h-0">
+      <div className="flex-1 overflow-y-auto lg:overflow-hidden flex flex-col lg:min-h-0">
+        <div className="lg:h-full flex flex-col gap-[clamp(0.5rem,1.5vh,1rem)]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[clamp(0.5rem,1.5vh,1rem)] lg:flex-1 lg:min-h-0">
             {/* Selection Panel */}
-            <Card className="shadow-lg overflow-hidden flex flex-col">
+            <Card className="shadow-lg lg:overflow-hidden flex flex-col">
               <CardHeader className="py-[clamp(0.375rem,0.75vh,0.5rem)] px-[clamp(0.5rem,1vw,0.75rem)] flex-none">
                 <CardTitle className="text-[clamp(0.75rem,1.5vw,1rem)]">Select Recitation</CardTitle>
                 <CardDescription className="text-[clamp(0.65rem,1.2vw,0.75rem)]">
                   Choose your reciter, listening mode, and segment to begin
                 </CardDescription>
               </CardHeader>
-              <CardContent className="overflow-y-auto flex-1 p-[clamp(0.5rem,1vw,0.75rem)] flex flex-col">
-                <div className="flex-1 flex flex-col justify-evenly gap-[clamp(0.125rem,0.25vh,0.25rem)]">
+              <CardContent className="lg:overflow-y-auto lg:flex-1 p-[clamp(0.5rem,1vw,0.75rem)] flex flex-col">
+                <div className="lg:flex-1 flex flex-col justify-evenly gap-[clamp(0.125rem,0.25vh,0.25rem)]">
                   <ReciterSelector onReciterChange={handleReciterChange} selectedReciterId={selectedReciterId} />
 
                   <RubSelector
@@ -268,7 +268,7 @@ export default function Home() {
             </Card>
 
             {/* Player Panel */}
-            <Card className="shadow-lg overflow-hidden flex flex-col">
+            <Card className="shadow-lg lg:overflow-hidden flex flex-col">
               <CardHeader className="py-[clamp(0.5rem,1vh,0.75rem)] px-[clamp(0.75rem,1.5vw,1rem)] flex-none">
                 <CardTitle className="text-[clamp(0.875rem,2vw,1.25rem)]">Now Playing</CardTitle>
                 {startAyahKey && totalAyahs > 0 && (
@@ -277,7 +277,7 @@ export default function Home() {
                   </CardDescription>
                 )}
               </CardHeader>
-              <CardContent className="overflow-y-auto flex-1 p-[clamp(0.75rem,1.5vw,1rem)]">
+              <CardContent className="lg:overflow-y-auto lg:flex-1 p-[clamp(0.75rem,1.5vw,1rem)]">
                 {startAyahKey && totalAyahs > 0 ? (
                   <AudioPlayer
                     startAyahKey={startAyahKey}
