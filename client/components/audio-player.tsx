@@ -226,7 +226,7 @@ export function AudioPlayer({
 
   if (!startAyahKey || totalAyahs === 0) {
     return (
-      <div className="text-center text-muted-foreground py-12">
+      <div className="h-full flex items-center justify-center text-center text-muted-foreground">
         <p className="text-lg">Select a reciter and segment to start listening</p>
       </div>
     )

@@ -277,7 +277,7 @@ export default function Home() {
                   </CardDescription>
                 )}
               </CardHeader>
-              <CardContent className="lg:overflow-y-auto lg:flex-1 p-[clamp(0.75rem,1.5vw,1rem)]">
+              <CardContent className="lg:overflow-y-auto lg:flex-1 p-[clamp(0.75rem,1.5vw,1rem)] flex flex-col">
                 {startAyahKey && totalAyahs > 0 ? (
                   <AudioPlayer
                     startAyahKey={startAyahKey}
@@ -288,7 +288,7 @@ export default function Home() {
                     onAyahChange={setCurrentAyahKey}
                   />
                 ) : (
-                  <div className="flex items-center justify-center text-center text-muted-foreground py-[clamp(1rem,2vh,2rem)]">
+                  <div className="flex-1 flex items-center justify-center text-center text-muted-foreground">
                     <div>
                       <BookOpen className="h-[clamp(2rem,4vw,3rem)] w-[clamp(2rem,4vw,3rem)] mx-auto mb-[clamp(0.5rem,1vh,0.75rem)] opacity-20" />
                       <p className="text-[clamp(0.875rem,2vw,1.125rem)]">Select a recitation to start</p>
